@@ -16,14 +16,19 @@
     <!-- Meta Tags -->
     <title>THE BITCOIN OVERVIEW | VOGUE Style</title>
     <link rel="icon" href="favicon.png" type="image/png">
-    <meta property="og:title" content="THE BITCOIN OVERVIEW | VOGUE Style">
+    <meta property="og:title" content="THE BITCOIN OVERVIEW">
     <meta property="og:description" content="Real-time Bitcoin Dashboard, On-chain Stats & Converter">
     <meta property="og:image" content="og-image.png">
 
-    <!-- Google Fonts -->
+    <meta name="twitter:card" content="summary_large_image">
+  　<meta name="twitter:title" content="THE BITCOIN OVERVIEW">
+  　<meta name="twitter:description" content="Real-time Bitcoin Dashboard, On-chain Stats & Converter">
+  　<meta name="twitter:image" content="https://github.com/CK121212195/market-price/og-image.png">
+
+    <!-- Google Fonts (ウェイトを500, 600まで拡張して力強さを追加) -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Montserrat:wght@200;300;400;500&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Montserrat:wght@300;400;500;600&display=swap" rel="stylesheet">
     
     <style>
         :root {
@@ -34,8 +39,9 @@
             --font-heading: 'Playfair Display', serif;
             --font-body: 'Montserrat', sans-serif;
             
-            --up-color: #00A651;
-            --down-color: #E3000F;
+            --up-color: #00A651; /* ボッテガ・グリーン */
+            --down-color: #E3000F; /* ルブタン・レッド */
+            --btc-orange: #F7931A; /* ビットコイン・オレンジ */
         }
 
         body {
@@ -74,7 +80,7 @@
             letter-spacing: 0.25em;
             color: var(--text-sub);
             text-transform: uppercase;
-            font-weight: 300;
+            font-weight: 400;
         }
 
         /* --- Live Market Cards --- */
@@ -118,7 +124,7 @@
         .live-indicator {
             font-size: 0.65rem;
             letter-spacing: 0.2em;
-            font-weight: 500;
+            font-weight: 600;
             color: var(--text-sub);
             display: flex;
             align-items: center;
@@ -138,7 +144,7 @@
 
         .card-body {
             font-size: 3.4rem;
-            font-weight: 200;
+            font-weight: 500; /* より力強く太いフォントに変更 */
             text-align: right;
             letter-spacing: -0.03em;
             margin-top: auto;
@@ -167,10 +173,16 @@
             font-size: 0.85rem;
             color: var(--text-sub);
             letter-spacing: 0.15em;
+            font-weight: 500;
             text-transform: uppercase;
         }
 
-        .sats-value { font-size: 1.8rem; font-weight: 300; transition: color 0.4s ease; }
+        .sats-value { 
+            font-size: 1.8rem; 
+            font-weight: 500; /* より力強く太いフォントに変更 */
+            transition: color 0.4s ease; 
+        }
+        
         .loading { color: var(--border-color) !important; font-size: 1.5rem; font-style: italic; }
 
         /* --- Section Titles --- */
@@ -202,16 +214,18 @@
         }
 
         .stats-row-label {
-            font-size: 0.8rem;
+            font-size: 0.85rem;
             color: var(--text-sub);
             letter-spacing: 0.15em;
+            font-weight: 500;
             text-transform: uppercase;
         }
 
         .stats-row-value {
-            font-size: 1.2rem;
-            font-weight: 300;
+            font-size: 1.3rem;
+            font-weight: 500; /* 太く */
             letter-spacing: 0.05em;
+            color: var(--btc-orange) !important; /* ビットコインオレンジを強制適用 */
         }
 
         /* --- Converter Section --- */
@@ -249,7 +263,7 @@
             text-align: right;
             font-size: 2.2rem;
             font-family: var(--font-body);
-            font-weight: 300;
+            font-weight: 400;
             color: var(--text-main);
             padding: 0 1.5rem;
         }
@@ -263,6 +277,7 @@
             color: var(--text-sub);
             width: 50px;
             text-align: right;
+            font-weight: 500;
             letter-spacing: 0.1em;
             text-transform: uppercase;
         }
@@ -304,6 +319,7 @@
             color: var(--text-main);
             padding: 0.8rem 1.5rem;
             font-family: var(--font-body);
+            font-weight: 500;
             font-size: 0.8rem;
             cursor: pointer;
             transition: all 0.3s;
@@ -327,6 +343,7 @@
             font-size: 0.75rem;
             letter-spacing: 0.3em;
             color: var(--text-sub);
+            font-weight: 500;
             text-transform: uppercase;
             margin-bottom: 2rem;
         }
@@ -359,7 +376,7 @@
         }
 
         .game-icon { font-size: 1.8rem; margin-bottom: 0.8rem; }
-        .game-name { font-size: 0.75rem; font-weight: 500; letter-spacing: 0.05em; }
+        .game-name { font-size: 0.75rem; font-weight: 600; letter-spacing: 0.05em; }
 
         @media (max-width: 768px) {
             h1 { font-size: 2.2rem; }
@@ -502,7 +519,7 @@ document.addEventListener("DOMContentLoaded", () => {
     // --- グローバル変数 ---
     let rateUsd = 0;
     let rateJpy = 0;
-    let currentSupply = 0; // ブロック高から計算された発行枚数
+    let currentSupply = 0; 
     let currentFocus = 'sats'; 
 
     const btcUsdEl = document.getElementById('btc-usd');
@@ -513,7 +530,6 @@ document.addEventListener("DOMContentLoaded", () => {
     // 1. ネットワーク統計データの取得と計算
     // ==========================================
     
-    // ブロック高から正確な発行枚数を自己計算する関数
     function calculateSupply(blockHeight) {
         let supply = 0;
         let reward = 50;
@@ -533,8 +549,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     async function fetchNetworkStats() {
         try {
-            // Mempool.space API (完全無料・プロキシ不要)
-            const [heightRes, feeRes] = await Promise.all([
+            const[heightRes, feeRes] = await Promise.all([
                 fetch('https://mempool.space/api/blocks/tip/height'),
                 fetch('https://mempool.space/api/v1/fees/recommended')
             ]);
@@ -545,12 +560,15 @@ document.addEventListener("DOMContentLoaded", () => {
             document.getElementById('stat-block').innerText = currentHeight.toLocaleString();
             document.getElementById('stat-fee').innerText = `${feeData.fastestFee} sats/vB`;
             
-            // 供給量の計算と表示
             currentSupply = calculateSupply(currentHeight);
             document.getElementById('stat-supply').innerText = `${currentSupply.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})} BTC`;
             
-            // 時価総額の更新（価格が既に取得されている場合）
             updateMarketCap();
+
+            // ★ ここが消えていた原因の修正箇所：データ取得後にloadingクラスを消す ★['stat-block', 'stat-fee', 'stat-supply', 'stat-mcap'].forEach(id => {
+                const el = document.getElementById(id);
+                if(el) el.classList.remove('loading');
+            });
 
         } catch (error) {
             console.error("Failed to fetch network stats:", error);
@@ -559,7 +577,6 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     }
 
-    // 価格変動に合わせて時価総額をリアルタイム更新
     function updateMarketCap() {
         if (currentSupply > 0 && rateUsd > 0) {
             const mcap = currentSupply * rateUsd;
@@ -567,7 +584,6 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     }
 
-    // 初回取得と3分ごとの定期更新
     fetchNetworkStats();
     setInterval(fetchNetworkStats, 3 * 60 * 1000);
 
@@ -597,7 +613,6 @@ document.addEventListener("DOMContentLoaded", () => {
                 satsUsdEl.classList.add('price-down');
             }
 
-            // 価格変動に伴いコンバーターと時価総額を再計算
             updateConverter();
             updateMarketCap();
         };
@@ -663,13 +678,12 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 // ==========================================
-// 4. Twitter シェア機能 (バズるハッシュタグ付き)
+// 4. Twitter シェア機能
 // ==========================================
 function shareTwitter() {
     const btcUsd = document.getElementById('btc-usd').innerText;
     const satsJpy = document.getElementById('sats-jpy').innerText;
     
-    // エレガントなシェア文章
     const text = `Experience the pulse of the market.\n\nBitcoin: ${btcUsd}\n1 Satoshi: ${satsJpy}\n\n`;
     const hashtags = "Bitcoin,LightningNetwork,Crypto";
     const url = window.location.href;
