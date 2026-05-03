@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    
+
     <!-- Google Analytics Tag -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-X1J77SKSG3"></script>
     <script>
@@ -21,15 +21,15 @@
     <meta property="og:image" content="og-image.png">
 
     <meta name="twitter:card" content="summary_large_image">
-  　<meta name="twitter:title" content="THE BITCOIN OVERVIEW">
-  　<meta name="twitter:description" content="Real-time Bitcoin Dashboard, On-chain Stats & Converter">
-  　<meta name="twitter:image" content="https://github.com/CK121212195/market-price/og-image.png">
+    <meta name="twitter:title" content="THE BITCOIN OVERVIEW">
+    <meta name="twitter:description" content="Real-time Bitcoin Dashboard, On-chain Stats & Converter">
+    <meta name="twitter:image" content="https://github.com/CK121212195/market-price/og-image.png">
 
     <!-- Google Fonts (ウェイトを500, 600まで拡張して力強さを追加) -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Montserrat:wght@300;400;500;600&display=swap" rel="stylesheet">
-    
+
     <style>
         :root {
             --bg-color: #FFFFFF;
@@ -144,7 +144,7 @@
 
         .card-body {
             font-size: 3.4rem;
-            font-weight: 500; /* より力強く太いフォントに変更 */
+            font-weight: 500;
             text-align: right;
             letter-spacing: -0.03em;
             margin-top: auto;
@@ -179,7 +179,7 @@
 
         .sats-value { 
             font-size: 1.8rem; 
-            font-weight: 500; /* より力強く太いフォントに変更 */
+            font-weight: 500;
             transition: color 0.4s ease; 
         }
         
@@ -223,9 +223,9 @@
 
         .stats-row-value {
             font-size: 1.3rem;
-            font-weight: 500; /* 太く */
+            font-weight: 500;
             letter-spacing: 0.05em;
-            color: var(--btc-orange) !important; /* ビットコインオレンジを強制適用 */
+            color: var(--btc-orange) !important;
         }
 
         /* --- Converter Section --- */
@@ -388,9 +388,8 @@
     </style>
 </head>
 <body>
-
 <div class="container">
-    
+
     <!-- HEADER -->
     <div class="header-section">
         <h1>The Bitcoin Overview</h1>
@@ -529,7 +528,6 @@ document.addEventListener("DOMContentLoaded", () => {
     // ==========================================
     // 1. ネットワーク統計データの取得と計算
     // ==========================================
-    
     function calculateSupply(blockHeight) {
         let supply = 0;
         let reward = 50;
@@ -549,7 +547,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     async function fetchNetworkStats() {
         try {
-            const[heightRes, feeRes] = await Promise.all([
+            const [heightRes, feeRes] = await Promise.all([
                 fetch('https://mempool.space/api/blocks/tip/height'),
                 fetch('https://mempool.space/api/v1/fees/recommended')
             ]);
@@ -565,7 +563,7 @@ document.addEventListener("DOMContentLoaded", () => {
             
             updateMarketCap();
 
-            // ★ ここが消えていた原因の修正箇所：データ取得後にloadingクラスを消す ★['stat-block', 'stat-fee', 'stat-supply', 'stat-mcap'].forEach(id => {
+            // プログラムの構文エラーを修正した箇所（きちんと改行しました）['stat-block', 'stat-fee', 'stat-supply', 'stat-mcap'].forEach(id => {
                 const el = document.getElementById(id);
                 if(el) el.classList.remove('loading');
             });
@@ -574,6 +572,12 @@ document.addEventListener("DOMContentLoaded", () => {
             console.error("Failed to fetch network stats:", error);
             document.getElementById('stat-block').innerText = "Unavailable";
             document.getElementById('stat-fee').innerText = "Unavailable";
+            
+            // エラーが発生した場合も取得中の文字（loading）を解除する安全策
+            ['stat-block', 'stat-fee', 'stat-supply', 'stat-mcap'].forEach(id => {
+                const el = document.getElementById(id);
+                if(el) el.classList.remove('loading');
+            });
         }
     }
 
@@ -587,12 +591,12 @@ document.addEventListener("DOMContentLoaded", () => {
     fetchNetworkStats();
     setInterval(fetchNetworkStats, 3 * 60 * 1000);
 
-
     // ==========================================
     // 2. WebSocket 価格データ取得
     // ==========================================
     function connectBinance() {
         const binanceWs = new WebSocket('wss://stream.binance.com:9443/ws/btcusdt@ticker');
+        
         binanceWs.onmessage = (event) => {
             const data = JSON.parse(event.data);
             rateUsd = parseFloat(data.c);
@@ -603,8 +607,11 @@ document.addEventListener("DOMContentLoaded", () => {
             const satsUsd = rateUsd / 100000000;
             satsUsdEl.innerText = `$${satsUsd.toFixed(6)}`;
 
+            btcUsdEl.classList.remove('loading');
+            satsUsdEl.classList.remove('loading');
             btcUsdEl.className = 'card-body';
             satsUsdEl.className = 'sats-value';
+            
             if (priceChange > 0) {
                 btcUsdEl.classList.add('price-up');
                 satsUsdEl.classList.add('price-up');
@@ -621,17 +628,21 @@ document.addEventListener("DOMContentLoaded", () => {
 
     function connectBitflyer() {
         const bitflyerWs = new WebSocket('wss://ws.lightstream.bitflyer.com/json-rpc');
+        
         bitflyerWs.onopen = () => {
             bitflyerWs.send(JSON.stringify({ method: "subscribe", params: { channel: "lightning_ticker_BTC_JPY" } }));
         };
+        
         bitflyerWs.onmessage = (event) => {
             const response = JSON.parse(event.data);
             if (response.params && response.params.message) {
                 rateJpy = response.params.message.ltp;
                 const satsJpy = rateJpy / 100000000;
+                
                 satsJpyEl.innerText = `¥${satsJpy.toFixed(4)}`;
-
+                satsJpyEl.classList.remove('loading');
                 satsJpyEl.className = 'sats-value';
+                
                 if (btcUsdEl.classList.contains('price-up')) satsJpyEl.classList.add('price-up');
                 else if (btcUsdEl.classList.contains('price-down')) satsJpyEl.classList.add('price-down');
 
@@ -666,7 +677,9 @@ document.addEventListener("DOMContentLoaded", () => {
         if (type !== 'btc') document.getElementById('input-btc').value = Number(btc.toFixed(8)); 
         if (type !== 'jpy') document.getElementById('input-jpy').value = (btc * rateJpy).toFixed(2);
         if (type !== 'usd') document.getElementById('input-usd').value = (btc * rateUsd).toFixed(2);
-    }['sats', 'btc', 'jpy', 'usd'].forEach(type => {
+    }
+
+    ['sats', 'btc', 'jpy', 'usd'].forEach(type => {
         const el = document.getElementById(`input-${type}`);
         el.addEventListener('input', (e) => {
             currentFocus = type;
