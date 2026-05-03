@@ -14,7 +14,7 @@
     </script>
 
     <!-- Meta Tags -->
-    <title>THE BITCOIN OVERVIEW | VOGUE Style</title>
+    <title>THE BITCOIN OVERVIEW</title>
     <link rel="icon" href="favicon.png" type="image/png">
     <meta property="og:title" content="THE BITCOIN OVERVIEW">
     <meta property="og:description" content="Real-time Bitcoin Dashboard, On-chain Stats & Converter">
@@ -25,7 +25,7 @@
     <meta name="twitter:description" content="Real-time Bitcoin Dashboard, On-chain Stats & Converter">
     <meta name="twitter:image" content="https://github.com/CK121212195/market-price/og-image.png">
 
-    <!-- Google Fonts (ウェイトを500, 600まで拡張して力強さを追加) -->
+    <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Montserrat:wght@300;400;500;600&display=swap" rel="stylesheet">
@@ -563,9 +563,11 @@ document.addEventListener("DOMContentLoaded", () => {
             
             updateMarketCap();
 
-            // プログラムの構文エラーを修正した箇所（きちんと改行しました）['stat-block', 'stat-fee', 'stat-supply', 'stat-mcap'].forEach(id => {
+            // 安全な配列の処理（エラー防止のため一度変数に代入）
+            const statIds =['stat-block', 'stat-fee', 'stat-supply', 'stat-mcap'];
+            statIds.forEach(id => {
                 const el = document.getElementById(id);
-                if(el) el.classList.remove('loading');
+                if (el) el.classList.remove('loading');
             });
 
         } catch (error) {
@@ -573,10 +575,11 @@ document.addEventListener("DOMContentLoaded", () => {
             document.getElementById('stat-block').innerText = "Unavailable";
             document.getElementById('stat-fee').innerText = "Unavailable";
             
-            // エラーが発生した場合も取得中の文字（loading）を解除する安全策
-            ['stat-block', 'stat-fee', 'stat-supply', 'stat-mcap'].forEach(id => {
+            // エラーが発生した場合も取得中の文字（loading）を解除
+            const statIds =['stat-block', 'stat-fee', 'stat-supply', 'stat-mcap'];
+            statIds.forEach(id => {
                 const el = document.getElementById(id);
-                if(el) el.classList.remove('loading');
+                if (el) el.classList.remove('loading');
             });
         }
     }
@@ -679,13 +682,17 @@ document.addEventListener("DOMContentLoaded", () => {
         if (type !== 'usd') document.getElementById('input-usd').value = (btc * rateUsd).toFixed(2);
     }
 
-    ['sats', 'btc', 'jpy', 'usd'].forEach(type => {
+    // 安全な配列の処理（エラー防止のため一度変数に代入）
+    const inputTypes =['sats', 'btc', 'jpy', 'usd'];
+    inputTypes.forEach(type => {
         const el = document.getElementById(`input-${type}`);
-        el.addEventListener('input', (e) => {
-            currentFocus = type;
-            calculateFrom(type, parseFloat(e.target.value) || 0);
-        });
-        el.addEventListener('focus', () => { currentFocus = type; });
+        if (el) {
+            el.addEventListener('input', (e) => {
+                currentFocus = type;
+                calculateFrom(type, parseFloat(e.target.value) || 0);
+            });
+            el.addEventListener('focus', () => { currentFocus = type; });
+        }
     });
 
 });
