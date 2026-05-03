@@ -17,7 +17,7 @@
     <title>THE BITCOIN OVERVIEW | VOGUE Style</title>
     <link rel="icon" href="favicon.png" type="image/png">
     <meta property="og:title" content="THE BITCOIN OVERVIEW | VOGUE Style">
-    <meta property="og:description" content="Real-time Bitcoin Dashboard & Converter">
+    <meta property="og:description" content="Real-time Bitcoin Dashboard, On-chain Stats & Converter">
     <meta property="og:image" content="og-image.png">
 
     <!-- Google Fonts -->
@@ -34,8 +34,8 @@
             --font-heading: 'Playfair Display', serif;
             --font-body: 'Montserrat', sans-serif;
             
-            --up-color: #00A651; /* ボッテガ・グリーン */
-            --down-color: #E3000F; /* ルブタン・レッド */
+            --up-color: #00A651;
+            --down-color: #E3000F;
         }
 
         body {
@@ -55,7 +55,7 @@
         /* --- Header --- */
         .header-section {
             text-align: center;
-            margin-bottom: 3rem;
+            margin-bottom: 4rem;
             border-bottom: 1px solid var(--text-main);
             padding-bottom: 2rem;
         }
@@ -173,20 +173,53 @@
         .sats-value { font-size: 1.8rem; font-weight: 300; transition: color 0.4s ease; }
         .loading { color: var(--border-color) !important; font-size: 1.5rem; font-style: italic; }
 
-        /* --- Converter Section --- */
+        /* --- Section Titles --- */
         .section-header {
             font-family: var(--font-heading);
             font-size: 2rem;
             font-style: italic;
             margin-bottom: 1.5rem;
             text-align: center;
+            color: var(--text-main);
         }
 
+        /* --- Network Statistics --- */
+        .stats-section {
+            margin-bottom: 5rem;
+        }
+
+        .stats-list {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .stats-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1.2rem 0;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .stats-row-label {
+            font-size: 0.8rem;
+            color: var(--text-sub);
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+        }
+
+        .stats-row-value {
+            font-size: 1.2rem;
+            font-weight: 300;
+            letter-spacing: 0.05em;
+        }
+
+        /* --- Converter Section --- */
         .converter-box {
             background: #FAFAFA;
             border: 1px solid var(--border-color);
             padding: 1.5rem 3rem;
-            margin-bottom: 4rem;
+            margin-bottom: 5rem;
         }
 
         .input-group {
@@ -221,7 +254,6 @@
             padding: 0 1.5rem;
         }
 
-        /* スピナーを隠す */
         input[type=number]::-webkit-inner-spin-button, 
         input[type=number]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
         input[type=number] { -moz-appearance: textfield; }
@@ -334,6 +366,7 @@
             .card { height: 200px; padding: 1.5rem; }
             .card-body { font-size: 2.4rem; }
             .input-group input { font-size: 1.6rem; }
+            .converter-box { padding: 1.5rem; }
         }
     </style>
 </head>
@@ -344,7 +377,7 @@
     <!-- HEADER -->
     <div class="header-section">
         <h1>The Bitcoin Overview</h1>
-        <div class="subtitle">Real-time Dashboard & Converter</div>
+        <div class="subtitle">Real-time Dashboard, Stats & Converter</div>
     </div>
 
     <!-- LIVE MARKET -->
@@ -371,6 +404,29 @@
                     <span class="sats-label">JPY</span>
                     <span class="sats-value loading" id="sats-jpy">...</span>
                 </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- NETWORK STATISTICS -->
+    <div class="stats-section">
+        <h2 class="section-header">Network Statistics</h2>
+        <div class="stats-list">
+            <div class="stats-row">
+                <span class="stats-row-label">Market Capitalization</span>
+                <span class="stats-row-value loading" id="stat-mcap">...</span>
+            </div>
+            <div class="stats-row">
+                <span class="stats-row-label">Circulating Supply</span>
+                <span class="stats-row-value loading" id="stat-supply">...</span>
+            </div>
+            <div class="stats-row">
+                <span class="stats-row-label">Current Block</span>
+                <span class="stats-row-value loading" id="stat-block">...</span>
+            </div>
+            <div class="stats-row">
+                <span class="stats-row-label">High Priority Fee</span>
+                <span class="stats-row-value loading" id="stat-fee">...</span>
             </div>
         </div>
     </div>
@@ -405,7 +461,6 @@
         <div class="action-box">
             <h3>Support with Lightning ⚡️</h3>
             <div class="btn-group">
-                <!-- Wallet of Satoshi のアドレスを設定済み -->
                 <button class="btn" onclick="sendTip(100, 'brashridge65@walletofsatoshi.com')">100 sats</button>
                 <button class="btn" onclick="sendTip(1000, 'brashridge65@walletofsatoshi.com')">1,000 sats</button>
                 <button class="btn" onclick="sendTip(10000, 'brashridge65@walletofsatoshi.com')">10,000 sats</button>
@@ -444,9 +499,10 @@
 <script>
 document.addEventListener("DOMContentLoaded", () => {
     
-    // --- グローバルレート ---
+    // --- グローバル変数 ---
     let rateUsd = 0;
     let rateJpy = 0;
+    let currentSupply = 0; // ブロック高から計算された発行枚数
     let currentFocus = 'sats'; 
 
     const btcUsdEl = document.getElementById('btc-usd');
@@ -454,7 +510,70 @@ document.addEventListener("DOMContentLoaded", () => {
     const satsJpyEl = document.getElementById('sats-jpy');
 
     // ==========================================
-    // 1. WebSocket データ取得
+    // 1. ネットワーク統計データの取得と計算
+    // ==========================================
+    
+    // ブロック高から正確な発行枚数を自己計算する関数
+    function calculateSupply(blockHeight) {
+        let supply = 0;
+        let reward = 50;
+        let blocksLeft = blockHeight;
+        while (blocksLeft > 0) {
+            if (blocksLeft >= 210000) {
+                supply += 210000 * reward;
+                blocksLeft -= 210000;
+                reward /= 2;
+            } else {
+                supply += blocksLeft * reward;
+                blocksLeft = 0;
+            }
+        }
+        return supply;
+    }
+
+    async function fetchNetworkStats() {
+        try {
+            // Mempool.space API (完全無料・プロキシ不要)
+            const [heightRes, feeRes] = await Promise.all([
+                fetch('https://mempool.space/api/blocks/tip/height'),
+                fetch('https://mempool.space/api/v1/fees/recommended')
+            ]);
+            
+            const currentHeight = parseInt(await heightRes.text());
+            const feeData = await feeRes.json();
+            
+            document.getElementById('stat-block').innerText = currentHeight.toLocaleString();
+            document.getElementById('stat-fee').innerText = `${feeData.fastestFee} sats/vB`;
+            
+            // 供給量の計算と表示
+            currentSupply = calculateSupply(currentHeight);
+            document.getElementById('stat-supply').innerText = `${currentSupply.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})} BTC`;
+            
+            // 時価総額の更新（価格が既に取得されている場合）
+            updateMarketCap();
+
+        } catch (error) {
+            console.error("Failed to fetch network stats:", error);
+            document.getElementById('stat-block').innerText = "Unavailable";
+            document.getElementById('stat-fee').innerText = "Unavailable";
+        }
+    }
+
+    // 価格変動に合わせて時価総額をリアルタイム更新
+    function updateMarketCap() {
+        if (currentSupply > 0 && rateUsd > 0) {
+            const mcap = currentSupply * rateUsd;
+            document.getElementById('stat-mcap').innerText = `$${mcap.toLocaleString('en-US', {maximumFractionDigits: 0})}`;
+        }
+    }
+
+    // 初回取得と3分ごとの定期更新
+    fetchNetworkStats();
+    setInterval(fetchNetworkStats, 3 * 60 * 1000);
+
+
+    // ==========================================
+    // 2. WebSocket 価格データ取得
     // ==========================================
     function connectBinance() {
         const binanceWs = new WebSocket('wss://stream.binance.com:9443/ws/btcusdt@ticker');
@@ -478,7 +597,9 @@ document.addEventListener("DOMContentLoaded", () => {
                 satsUsdEl.classList.add('price-down');
             }
 
+            // 価格変動に伴いコンバーターと時価総額を再計算
             updateConverter();
+            updateMarketCap();
         };
         binanceWs.onclose = () => setTimeout(connectBinance, 5000); 
     }
@@ -509,7 +630,7 @@ document.addEventListener("DOMContentLoaded", () => {
     connectBitflyer();
 
     // ==========================================
-    // 2. コンバーター（相互計算）ロジック
+    // 3. コンバーター（相互計算）ロジック
     // ==========================================
     function updateConverter() {
         if (rateUsd === 0 || rateJpy === 0) return;
@@ -542,22 +663,24 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 // ==========================================
-// 3. Twitter シェア機能
+// 4. Twitter シェア機能 (バズるハッシュタグ付き)
 // ==========================================
 function shareTwitter() {
     const btcUsd = document.getElementById('btc-usd').innerText;
     const satsJpy = document.getElementById('sats-jpy').innerText;
-    const text = `The Bitcoin Overview\n\n現在のビットコイン価格は ${btcUsd} 🚀\n1 Satoshi = ${satsJpy}\n\n`;
+    
+    // エレガントなシェア文章
+    const text = `Experience the pulse of the market.\n\nBitcoin: ${btcUsd}\n1 Satoshi: ${satsJpy}\n\n`;
+    const hashtags = "Bitcoin,LightningNetwork,Crypto";
     const url = window.location.href;
-    window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(url)}`, '_blank');
+    
+    window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(url)}&hashtags=${hashtags}`, '_blank');
 }
 
 // ==========================================
-// 4. ライトニング 投げ銭機能
+// 5. ライトニング 投げ銭機能
 // ==========================================
 function sendTip(amount, address) {
-    // ユーザーのウォレットアプリを起動して、アドレスを送金先にセットします
-    // ※ 金額(amount)の引き継ぎ可否はユーザーが使用するウォレットの種類に依存します
     window.location.href = `lightning:${address}`;
 }
 </script>
