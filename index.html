@@ -27,7 +27,6 @@
         body {
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
             background-color: var(--bg-dark);
-            /* おしゃれな背景グラデーション */
             background-image: 
                 radial-gradient(circle at 15% 0%, rgba(30, 41, 59, 0.8), transparent 40%),
                 radial-gradient(circle at 85% 100%, rgba(15, 23, 42, 0.8), transparent 40%);
@@ -52,14 +51,12 @@
             -webkit-text-fill-color: transparent;
         }
 
-        /* グリッドレイアウト */
         .dashboard {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
             gap: 1.5rem;
         }
 
-        /* グラスモーフィズム調のカード */
         .card {
             background: var(--card-bg);
             border: 1px solid var(--border-color);
@@ -87,6 +84,13 @@
             overflow: hidden;
         }
 
+        /* ★ここが原因でした：コンテナに高さを指定して潰れないようにする */
+        .tradingview-widget-container {
+            width: 100%;
+            height: 100%;
+            flex-grow: 1;
+        }
+
         .card-header-custom {
             position: absolute;
             top: 12px;
@@ -112,7 +116,6 @@
             font-size: 0.95rem;
         }
 
-        /* ライブインジケーターのアニメーション */
         .live-indicator {
             color: var(--accent-green);
             font-size: 0.75rem;
@@ -137,7 +140,6 @@
             transition: color 0.3s ease, text-shadow 0.3s ease;
         }
 
-        /* Satoshi用レイアウト */
         .sats-container {
             display: flex;
             flex-direction: column;
@@ -165,7 +167,6 @@
             transition: color 0.3s ease, text-shadow 0.3s ease;
         }
 
-        /* 価格変動時の発光アニメーション */
         @keyframes flashUp {
             0% { color: var(--accent-green); text-shadow: 0 0 15px var(--glow-green); }
             100% { color: var(--text-main); text-shadow: none; }
@@ -198,7 +199,7 @@
     <h1>Market Overview</h1>
     <div class="dashboard">
 
-        <!-- 1. BTC/USD カード (Binance WebSocket) -->
+        <!-- 1. BTC/USD -->
         <div class="card">
             <div class="card-header">
                 <span>Bitcoin (BTC/USD)</span>
@@ -207,7 +208,7 @@
             <div class="card-body loading" id="btc-usd">Connecting...</div>
         </div>
 
-        <!-- 2. 1 Sats カード (WebSocketから自動計算) -->
+        <!-- 2. 1 Sats -->
         <div class="card">
             <div class="card-header">
                 <span>1 Satoshi (1/1億 BTC)</span>
@@ -225,14 +226,14 @@
             </div>
         </div>
 
-        <!-- 3. S&P 500 (TradingView) -->
+        <!-- 3. S&P 500 (OANDAのCFD銘柄に変更しリアルタイム化) -->
         <div class="card tv-card">
             <div class="card-header-custom">S&P 500</div>
             <div class="tradingview-widget-container">
                 <div class="tradingview-widget-container__widget"></div>
                 <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/tv-widget-mini-symbol-overview.js" async>
                 {
-                    "symbol": "SP:SPX",
+                    "symbol": "OANDA:SPX500USD",
                     "width": "100%",
                     "height": "100%",
                     "locale": "ja",
@@ -246,14 +247,14 @@
             </div>
         </div>
 
-        <!-- 4. 日経平均株価 (TradingView) -->
+        <!-- 4. 日経平均株価 (OANDAのCFD銘柄に変更しリアルタイム化) -->
         <div class="card tv-card">
             <div class="card-header-custom">日経平均株価</div>
             <div class="tradingview-widget-container">
                 <div class="tradingview-widget-container__widget"></div>
                 <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/tv-widget-mini-symbol-overview.js" async>
                 {
-                    "symbol": "TVC:NI225",
+                    "symbol": "OANDA:JP225JPY",
                     "width": "100%",
                     "height": "100%",
                     "locale": "ja",
@@ -267,7 +268,7 @@
             </div>
         </div>
 
-        <!-- 5. 米国債10年金利 (TradingView) -->
+        <!-- 5. 米国債10年金利 (そのまま) -->
         <div class="card tv-card">
             <div class="card-header-custom">米国債10年金利</div>
             <div class="tradingview-widget-container">
@@ -288,7 +289,7 @@
             </div>
         </div>
 
-        <!-- 6. 日本国債10年金利 (TradingView) -->
+        <!-- 6. 日本国債10年金利 (そのまま) -->
         <div class="card tv-card">
             <div class="card-header-custom">日本国債10年金利</div>
             <div class="tradingview-widget-container">
@@ -315,14 +316,12 @@
 <script>
 document.addEventListener("DOMContentLoaded", () => {
     
-    // 値が変動した時のチカチカ（発光）アニメーション管理
     function flashElement(el, className) {
         el.classList.remove('flash-up', 'flash-down', 'loading');
-        void el.offsetWidth; // アニメーションのリセット用
+        void el.offsetWidth;
         el.classList.add(className);
     }
 
-    // --- 1. Binance WebSocket接続 (BTC/USD および Sats/USD計算) ---
     const btcUsdEl = document.getElementById('btc-usd');
     const satsUsdEl = document.getElementById('sats-usd');
     let lastBtcUsd = 0;
@@ -334,10 +333,8 @@ document.addEventListener("DOMContentLoaded", () => {
             const data = JSON.parse(event.data);
             const currentPrice = parseFloat(data.c);
             
-            // BTC/USD の表示更新
             btcUsdEl.innerText = `$${currentPrice.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
             
-            // 1 Satsあたりの USD を計算 (1億分の1)
             const satsUsd = currentPrice / 100000000;
             satsUsdEl.innerText = `$${satsUsd.toFixed(6)}`;
 
@@ -353,13 +350,10 @@ document.addEventListener("DOMContentLoaded", () => {
             lastBtcUsd = currentPrice;
         };
 
-        // 切断された場合の自動再接続
         binanceWs.onclose = () => setTimeout(connectBinance, 5000); 
     }
     connectBinance();
 
-    // --- 2. bitFlyer WebSocket接続 (Sats/JPY計算用) ---
-    // 日本円レートのリアルタイム性を担保するため、日本最大のbitFlyerのAPIを利用します
     const satsJpyEl = document.getElementById('sats-jpy');
     let lastBtcJpy = 0;
 
@@ -378,7 +372,6 @@ document.addEventListener("DOMContentLoaded", () => {
             if (response.params && response.params.message) {
                 const currentPrice = response.params.message.ltp;
                 
-                // 1 Satsあたりの JPY を計算 (1億分の1)
                 const satsJpy = currentPrice / 100000000;
                 satsJpyEl.innerText = `¥${satsJpy.toFixed(4)}`;
 
@@ -393,7 +386,6 @@ document.addEventListener("DOMContentLoaded", () => {
             }
         };
 
-        // 切断された場合の自動再接続
         bitflyerWs.onclose = () => setTimeout(connectBitflyer, 5000); 
     }
     connectBitflyer();
