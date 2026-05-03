@@ -8,18 +8,21 @@
     <!-- Google Fonts: VOGUE風のエレガントなセリフ体と、モダンなサンセリフ体 -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Montserrat:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Montserrat:wght@200;300;400;500&display=swap" rel="stylesheet">
     
     <style>
         :root {
-            --bg-color: #FBFBFB; /* わずかに温かみのある大理石のような白 */
-            --border-color: #E0E0E0;
-            --text-main: #111111; /* 漆黒 */
+            /* コントラストを際立たせた純白と漆黒 */
+            --bg-color: #FFFFFF;
+            --border-color: #EAEAEA;
+            --text-main: #000000;
             --text-sub: #888888;
             --font-heading: 'Playfair Display', serif;
             --font-body: 'Montserrat', sans-serif;
-            --up-color: #1d5733; /* エレガントな深緑 */
-            --down-color: #8a1e1e; /* エレガントな深紅 */
+            
+            /* プラダを着た悪魔風の鮮烈でクッキリしたハイブランド・カラー */
+            --up-color: #00A651; /* ボッテガ・グリーン / 鮮明な緑 */
+            --down-color: #E3000F; /* ルブタン・レッド / 鮮烈な赤 */
         }
 
         body {
@@ -36,7 +39,6 @@
             margin: 0 auto;
         }
 
-        /* 雑誌の表紙のようなヘッダー */
         .header-section {
             text-align: center;
             margin-bottom: 4rem;
@@ -46,44 +48,43 @@
 
         h1 {
             font-family: var(--font-heading);
-            font-size: 3.5rem;
+            font-size: 3.8rem;
             font-weight: 700;
-            letter-spacing: 0.1em;
+            letter-spacing: 0.08em;
             text-transform: uppercase;
             margin: 0 0 0.5rem 0;
         }
 
         .subtitle {
             font-size: 0.85rem;
-            letter-spacing: 0.2em;
+            letter-spacing: 0.25em;
             color: var(--text-sub);
             text-transform: uppercase;
+            font-weight: 300;
         }
 
         .dashboard {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
-            gap: 2rem;
+            gap: 2.5rem;
         }
 
-        /* 洗練されたシャープなカード */
         .card {
             background: #FFFFFF;
             border: 1px solid var(--border-color);
-            padding: 2rem;
-            height: 250px;
+            padding: 2.5rem 2rem;
+            height: 240px;
             display: flex;
             flex-direction: column;
             justify-content: space-between;
             position: relative;
-            border-radius: 0; /* 角丸をなくしエッジを効かせる */
             transition: all 0.5s cubic-bezier(0.165, 0.84, 0.44, 1);
         }
 
         .card:hover {
             border-color: var(--text-main);
-            box-shadow: 0 20px 40px rgba(0,0,0,0.04);
-            transform: translateY(-4px);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.06);
+            transform: translateY(-5px);
         }
 
         .card-header {
@@ -94,16 +95,16 @@
 
         .card-title {
             font-family: var(--font-heading);
-            font-size: 1.4rem;
+            font-size: 1.5rem;
             font-style: italic;
             color: var(--text-main);
         }
 
         .live-indicator {
             font-size: 0.65rem;
-            letter-spacing: 0.15em;
-            font-weight: 600;
-            color: var(--text-main);
+            letter-spacing: 0.2em;
+            font-weight: 500;
+            color: var(--text-sub);
             display: flex;
             align-items: center;
             gap: 6px;
@@ -120,16 +121,26 @@
 
         @keyframes blink {
             0%, 100% { opacity: 1; }
-            50% { opacity: 0.2; }
+            50% { opacity: 0.1; }
         }
 
         .card-body {
-            font-size: 3.2rem;
-            font-weight: 300;
+            font-size: 3.4rem;
+            font-weight: 200; /* より細く繊細なフォントウェイト */
             text-align: right;
-            letter-spacing: -0.02em;
+            letter-spacing: -0.03em;
             margin-top: auto;
             transition: color 0.4s ease;
+        }
+
+        /* --- 前日比の上昇・下落カラー --- */
+        .price-up {
+            color: var(--up-color) !important;
+            text-shadow: 0 0 20px rgba(0, 166, 81, 0.1);
+        }
+        .price-down {
+            color: var(--down-color) !important;
+            text-shadow: 0 0 20px rgba(227, 0, 15, 0.1);
         }
 
         .sats-container {
@@ -150,74 +161,27 @@
         .sats-label {
             font-size: 0.85rem;
             color: var(--text-sub);
-            letter-spacing: 0.1em;
+            letter-spacing: 0.15em;
             text-transform: uppercase;
         }
 
         .sats-value {
             font-size: 1.8rem;
             font-weight: 300;
-        }
-
-        /* --- TradingView カード特例（真っ黒問題の解決部分） --- */
-        .tv-card {
-            padding: 0;
-            overflow: hidden;
-        }
-
-        /* 絶対配置で強制的に親枠にフィットさせる */
-        .tradingview-wrapper {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-        }
-
-        .tradingview-widget-container {
-            width: 100% !important;
-            height: 100% !important;
-        }
-
-        .chart-label {
-            position: absolute;
-            top: 1.5rem;
-            left: 1.5rem;
-            z-index: 10;
-            font-family: var(--font-heading);
-            font-style: italic;
-            font-size: 1.3rem;
-            color: var(--text-main);
-            background: rgba(255, 255, 255, 0.7);
-            padding: 2px 10px;
-            backdrop-filter: blur(8px);
-            pointer-events: none;
-        }
-
-        /* 派手な発光をやめ、文字色がスッと変わるエレガントなアニメーション */
-        .flash-up { animation: elegantUp 1.2s ease-out; }
-        .flash-down { animation: elegantDown 1.2s ease-out; }
-
-        @keyframes elegantUp {
-            0% { color: var(--up-color); }
-            100% { color: var(--text-main); }
-        }
-
-        @keyframes elegantDown {
-            0% { color: var(--down-color); }
-            100% { color: var(--text-main); }
+            transition: color 0.4s ease;
         }
 
         .loading {
-            color: var(--border-color);
+            color: var(--border-color) !important;
             font-size: 1.5rem;
+            font-style: italic;
         }
 
         @media (max-width: 768px) {
             h1 { font-size: 2.2rem; }
-            .card { height: 220px; }
+            .card { height: 200px; padding: 1.5rem; }
             .card-body { font-size: 2.4rem; }
-            .dashboard { gap: 1rem; }
+            .dashboard { gap: 1.5rem; }
         }
     </style>
 </head>
@@ -237,7 +201,7 @@
                 <span class="card-title">Bitcoin (BTC/USD)</span>
                 <span class="live-indicator"><span class="live-dot"></span>LIVE</span>
             </div>
-            <div class="card-body loading" id="btc-usd">...</div>
+            <div class="card-body loading" id="btc-usd">Fetching...</div>
         </div>
 
         <!-- 2. 1 Sats -->
@@ -258,96 +222,40 @@
             </div>
         </div>
 
-        <!-- 3. S&P 500 (OANDA) -->
-        <div class="card tv-card">
-            <div class="chart-label">S&P 500</div>
-            <div class="tradingview-wrapper">
-                <div class="tradingview-widget-container">
-                    <div class="tradingview-widget-container__widget"></div>
-                    <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/tv-widget-mini-symbol-overview.js" async>
-                    {
-                        "symbol": "OANDA:SPX500USD",
-                        "width": "100%",
-                        "height": "100%",
-                        "locale": "ja",
-                        "dateRange": "1D",
-                        "colorTheme": "light",
-                        "isTransparent": true,
-                        "autosize": true,
-                        "largeChartUrl": ""
-                    }
-                    </script>
-                </div>
+        <!-- 3. S&P 500 -->
+        <div class="card">
+            <div class="card-header">
+                <span class="card-title">S&P 500</span>
+                <span class="live-indicator">DAILY</span>
             </div>
+            <div class="card-body loading" id="sp500">Fetching...</div>
         </div>
 
-        <!-- 4. 日経平均株価 (OANDA) -->
-        <div class="card tv-card">
-            <div class="chart-label">Nikkei 225</div>
-            <div class="tradingview-wrapper">
-                <div class="tradingview-widget-container">
-                    <div class="tradingview-widget-container__widget"></div>
-                    <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/tv-widget-mini-symbol-overview.js" async>
-                    {
-                        "symbol": "OANDA:JP225JPY",
-                        "width": "100%",
-                        "height": "100%",
-                        "locale": "ja",
-                        "dateRange": "1D",
-                        "colorTheme": "light",
-                        "isTransparent": true,
-                        "autosize": true,
-                        "largeChartUrl": ""
-                    }
-                    </script>
-                </div>
+        <!-- 4. 日経平均株価 -->
+        <div class="card">
+            <div class="card-header">
+                <span class="card-title">Nikkei 225</span>
+                <span class="live-indicator">DAILY</span>
             </div>
+            <div class="card-body loading" id="nikkei">Fetching...</div>
         </div>
 
         <!-- 5. 米国債10年金利 -->
-        <div class="card tv-card">
-            <div class="chart-label">US 10Y Yield</div>
-            <div class="tradingview-wrapper">
-                <div class="tradingview-widget-container">
-                    <div class="tradingview-widget-container__widget"></div>
-                    <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/tv-widget-mini-symbol-overview.js" async>
-                    {
-                        "symbol": "TVC:US10Y",
-                        "width": "100%",
-                        "height": "100%",
-                        "locale": "ja",
-                        "dateRange": "1D",
-                        "colorTheme": "light",
-                        "isTransparent": true,
-                        "autosize": true,
-                        "largeChartUrl": ""
-                    }
-                    </script>
-                </div>
+        <div class="card">
+            <div class="card-header">
+                <span class="card-title">US 10Y Yield</span>
+                <span class="live-indicator">DAILY</span>
             </div>
+            <div class="card-body loading" id="us10y">Fetching...</div>
         </div>
 
-        <!-- 6. 日本国債10年金利 -->
-        <div class="card tv-card">
-            <div class="chart-label">JP 10Y Yield</div>
-            <div class="tradingview-wrapper">
-                <div class="tradingview-widget-container">
-                    <div class="tradingview-widget-container__widget"></div>
-                    <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/tv-widget-mini-symbol-overview.js" async>
-                    {
-                        "symbol": "TVC:JP10Y",
-                        "width": "100%",
-                        "height": "100%",
-                        "locale": "ja",
-                        "dateRange": "1D",
-                        "colorTheme": "light",
-                        "isTransparent": true,
-                        "autosize": true,
-                        "largeChartUrl": ""
-                    }
-                    </script>
-                </div>
+        <!-- 6. ドル円為替レート -->
+        <div class="card">
+            <div class="card-header">
+                <span class="card-title">USD / JPY</span>
+                <span class="live-indicator">DAILY</span>
             </div>
+            <div class="card-body loading" id="usdjpy">Fetching...</div>
         </div>
 
     </div>
@@ -356,79 +264,119 @@
 <script>
 document.addEventListener("DOMContentLoaded", () => {
     
-    function flashElement(el, className) {
-        el.classList.remove('flash-up', 'flash-down', 'loading');
-        void el.offsetWidth;
-        el.classList.add(className);
-    }
-
+    // ==========================================
+    // 1. 仮想通貨のリアルタイムデータ (Binance & bitFlyer)
+    // ==========================================
     const btcUsdEl = document.getElementById('btc-usd');
     const satsUsdEl = document.getElementById('sats-usd');
-    let lastBtcUsd = 0;
+    const satsJpyEl = document.getElementById('sats-jpy');
 
     function connectBinance() {
         const binanceWs = new WebSocket('wss://stream.binance.com:9443/ws/btcusdt@ticker');
-        
         binanceWs.onmessage = (event) => {
             const data = JSON.parse(event.data);
             const currentPrice = parseFloat(data.c);
+            const priceChange = parseFloat(data.p); 
             
             btcUsdEl.innerText = `$${currentPrice.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
             
             const satsUsd = currentPrice / 100000000;
             satsUsdEl.innerText = `$${satsUsd.toFixed(6)}`;
 
-            if (lastBtcUsd !== 0) {
-                if (currentPrice > lastBtcUsd) {
-                    flashElement(btcUsdEl, 'flash-up');
-                    flashElement(satsUsdEl, 'flash-up');
-                } else if (currentPrice < lastBtcUsd) {
-                    flashElement(btcUsdEl, 'flash-down');
-                    flashElement(satsUsdEl, 'flash-down');
-                }
-            }
-            lastBtcUsd = currentPrice;
-        };
+            btcUsdEl.className = 'card-body';
+            satsUsdEl.className = 'sats-value';
+            satsJpyEl.className = 'sats-value'; 
 
+            // プラダを着た悪魔カラーの適用
+            if (priceChange > 0) {
+                btcUsdEl.classList.add('price-up');
+                satsUsdEl.classList.add('price-up');
+                satsJpyEl.classList.add('price-up');
+            } else if (priceChange < 0) {
+                btcUsdEl.classList.add('price-down');
+                satsUsdEl.classList.add('price-down');
+                satsJpyEl.classList.add('price-down');
+            }
+        };
         binanceWs.onclose = () => setTimeout(connectBinance, 5000); 
     }
     connectBinance();
 
-    const satsJpyEl = document.getElementById('sats-jpy');
-    let lastBtcJpy = 0;
-
     function connectBitflyer() {
         const bitflyerWs = new WebSocket('wss://ws.lightstream.bitflyer.com/json-rpc');
-        
         bitflyerWs.onopen = () => {
             bitflyerWs.send(JSON.stringify({
                 method: "subscribe",
                 params: { channel: "lightning_ticker_BTC_JPY" }
             }));
         };
-
         bitflyerWs.onmessage = (event) => {
             const response = JSON.parse(event.data);
             if (response.params && response.params.message) {
                 const currentPrice = response.params.message.ltp;
-                
                 const satsJpy = currentPrice / 100000000;
                 satsJpyEl.innerText = `¥${satsJpy.toFixed(4)}`;
-
-                if (lastBtcJpy !== 0) {
-                    if (currentPrice > lastBtcJpy) {
-                        flashElement(satsJpyEl, 'flash-up');
-                    } else if (currentPrice < lastBtcJpy) {
-                        flashElement(satsJpyEl, 'flash-down');
-                    }
-                }
-                lastBtcJpy = currentPrice;
             }
         };
-
         bitflyerWs.onclose = () => setTimeout(connectBitflyer, 5000); 
     }
     connectBitflyer();
+
+    // ==========================================
+    // 2. 株価・金利・為替データ (CNBC APIを利用)
+    // N/Aを回避するプロキシ不要の裏ルートエンドポイント
+    // ==========================================
+    function fetchCNBCData() {
+        // scriptタグを使ったJSONPリクエストでCORSブロックを無効化
+        const script = document.createElement('script');
+        script.src = "https://quote.cnbc.com/quote-html-webservice/restQuote/symbolType/symbol?symbols=.SPX,.N225,US10Y-US,JPY=&requestMethod=itv&noform=1&output=json&callback=processCNBCData";
+        document.body.appendChild(script);
+        
+        // 取得完了後にスクリプトタグをお掃除
+        script.onload = () => script.remove();
+    }
+
+    // CNBCからデータが届いた時に実行される関数
+    window.processCNBCData = function(data) {
+        if (!data || !data.FormattedQuoteResult || !data.FormattedQuoteResult.FormattedQuote) return;
+        
+        const quotes = data.FormattedQuoteResult.FormattedQuote;
+        
+        // CNBCのティッカーとHTMLのIDの紐付け
+        const symbolMap = {
+            '.SPX': { id: 'sp500', prefix: '', suffix: '' },
+            '.N225': { id: 'nikkei', prefix: '¥', suffix: '' },
+            'US10Y-US': { id: 'us10y', prefix: '', suffix: '%' },
+            'JPY=': { id: 'usdjpy', prefix: '¥', suffix: '' }
+        };
+
+        const quoteArray = Array.isArray(quotes) ? quotes : [quotes];
+
+        quoteArray.forEach(quote => {
+            const mapInfo = symbolMap[quote.symbol];
+            if (!mapInfo) return;
+
+            const el = document.getElementById(mapInfo.id);
+            if (!el) return;
+
+            // 価格の表示
+            const lastPriceStr = quote.last; 
+            el.innerText = `${mapInfo.prefix}${lastPriceStr}${mapInfo.suffix}`;
+            
+            // 前日比の色付け
+            const changeVal = parseFloat(quote.change.replace(/,/g, ''));
+            el.className = 'card-body'; 
+            if (changeVal > 0) {
+                el.classList.add('price-up');
+            } else if (changeVal < 0) {
+                el.classList.add('price-down');
+            }
+        });
+    };
+
+    // 初回取得と、5分ごとの自動更新
+    fetchCNBCData();
+    setInterval(fetchCNBCData, 5 * 60 * 1000);
 
 });
 </script>
