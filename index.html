@@ -42,9 +42,9 @@
             --font-heading: 'Playfair Display', serif;
             --font-body: 'Montserrat', sans-serif;
             
-            --up-color: #00A651; /* ボッテガ・グリーン */
-            --down-color: #E3000F; /* ルブタン・レッド */
-            --btc-orange: #F7931A; /* ビットコイン・オレンジ */
+            --up-color: #00A651; 
+            --down-color: #E3000F; 
+            --btc-orange: #F7931A; 
         }
 
         * { box-sizing: border-box; }
@@ -56,7 +56,6 @@
             margin: 0;
             padding: 4rem 1.5rem;
             -webkit-font-smoothing: antialiased;
-            /* 横揺れ・はみ出しを完全に防ぐ設定 */
             overflow-x: hidden;
             width: 100%;
         }
@@ -245,7 +244,6 @@
             position: relative;
         }
 
-        /* X軸・Y軸のラベル設定 */
         .chart-y-axis {
             position: absolute;
             top: 0; bottom: 0; right: 0;
@@ -269,7 +267,6 @@
             text-transform: uppercase;
         }
 
-        /* インタラクティブなクロスヘア(縦線)とツールチップ */
         #chart-crosshair {
             display: none;
             position: absolute;
@@ -368,7 +365,6 @@
 
         .input-group input {
             flex-grow: 1;
-            /* 桁数が増えても親要素を押し広げない魔法のコード */
             min-width: 0; 
             width: 100%;
             border: none;
@@ -381,10 +377,6 @@
             color: var(--text-main);
             padding: 0 1.5rem;
         }
-
-        input[type=number]::-webkit-inner-spin-button, 
-        input[type=number]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
-        input[type=number] { -moz-appearance: textfield; }
 
         .currency-label {
             font-size: 0.9rem;
@@ -470,11 +462,11 @@
         .game-name { font-size: 0.75rem; font-weight: 600; letter-spacing: 0.05em; }
 
         /* ====================================================
-           ★ スマホ向け完全レスポンシブ設定（修正版） ★
+           ★ スマホ向け完全レスポンシブ設定 ★
         ==================================================== */
         @media (max-width: 768px) {
             body { padding: 2rem 1rem; }
-            h1 { font-size: 1.8rem; } /* タイトルを少し小さくして見切れ防止 */
+            h1 { font-size: 1.8rem; }
             .subtitle { font-size: 0.7rem; }
             
             .dashboard { gap: 1rem; margin-bottom: 3rem; }
@@ -491,14 +483,13 @@
             
             .converter-box { padding: 1.2rem 1rem; margin-bottom: 3rem; width: 100%; } 
             
-            /* 入力ボックス内の数字がはみ出さないようにサイズ調整 */
             .input-group input { font-size: 1.2rem; padding: 0 0.5rem; }
             .currency-icon { font-size: 1.1rem; width: 25px; }
             .currency-label { font-size: 0.75rem; width: 35px; }
             
             .actions-wrapper { gap: 1rem; flex-direction: column; }
             .action-box { width: 100%; min-width: 100%; padding: 1.5rem 1rem; }
-            .btn { padding: 0.8rem 1rem; font-size: 0.75rem; } /* ボタンの横幅も調整 */
+            .btn { padding: 0.8rem 1rem; font-size: 0.75rem; }
             
             .games-grid { gap: 1rem; }
             .game-card { width: 45%; height: 90px; }
@@ -550,26 +541,22 @@
         </div>
         
         <div class="chart-wrapper" id="chart-wrapper">
-            <!-- Y軸の価格ラベル -->
             <div class="chart-y-axis">
                 <span id="chart-y-max"></span>
                 <span id="chart-y-min"></span>
             </div>
             
-            <!-- インタラクティブなツールチップ -->
             <div id="chart-crosshair"></div>
             <div id="chart-tooltip">
                 <div id="tooltip-date"></div>
                 <div id="tooltip-price"></div>
             </div>
 
-            <!-- SVGチャート描画エリア -->
             <div class="chart-svg-container" id="btc-chart">
                 <div class="loading" style="text-align: center; line-height: 200px;">Drawing...</div>
             </div>
         </div>
         
-        <!-- X軸の日付ラベル -->
         <div class="chart-x-axis">
             <span id="chart-x-start"></span>
             <span id="chart-x-end">Today</span>
@@ -604,22 +591,23 @@
     <div class="converter-box">
         <div class="input-group">
             <span class="currency-icon">₿</span>
-            <input type="number" id="input-sats" value="100">
+            <!-- inputmode="decimal"を追加してスマホで数字キーボードを呼び出す -->
+            <input type="text" inputmode="decimal" id="input-sats" value="100">
             <span class="currency-label">sats</span>
         </div>
         <div class="input-group">
             <span class="currency-icon">₿</span>
-            <input type="number" id="input-btc">
+            <input type="text" inputmode="decimal" id="input-btc">
             <span class="currency-label">BTC</span>
         </div>
         <div class="input-group">
             <span class="currency-icon">¥</span>
-            <input type="number" id="input-jpy">
+            <input type="text" inputmode="decimal" id="input-jpy">
             <span class="currency-label">JPY</span>
         </div>
         <div class="input-group">
             <span class="currency-icon">$</span>
-            <input type="number" id="input-usd">
+            <input type="text" inputmode="decimal" id="input-usd">
             <span class="currency-label">USD</span>
         </div>
     </div>
@@ -678,14 +666,13 @@ document.addEventListener("DOMContentLoaded", () => {
     const satsJpyEl = document.getElementById('sats-jpy');
 
     // ==========================================
-    // 0. 超軽量 1-Year Trend Chart (オレンジ化 & ホバー対応)
+    // 0. 超軽量 1-Year Trend Chart
     // ==========================================
     async function drawChart() {
         try {
             const res = await fetch('https://api.binance.com/api/v3/klines?symbol=BTCUSDT&interval=1d&limit=365');
             const data = await res.json();
             
-            // データ整形（時間と価格の配列を作る）
             const chartData = data.map(candle => ({
                 time: candle[0],
                 price: parseFloat(candle[4])
@@ -695,7 +682,6 @@ document.addEventListener("DOMContentLoaded", () => {
             const minPrice = Math.min(...prices);
             const maxPrice = Math.max(...prices);
             
-            // Y軸（価格）、X軸（日付）のラベルを書き込む
             document.getElementById('chart-y-max').innerText = `$${maxPrice.toLocaleString(undefined, {maximumFractionDigits: 0})}`;
             document.getElementById('chart-y-min').innerText = `$${minPrice.toLocaleString(undefined, {maximumFractionDigits: 0})}`;
             
@@ -706,7 +692,6 @@ document.addEventListener("DOMContentLoaded", () => {
             const height = 200;
             const padding = 15;
             
-            // チャート線の座標計算
             const points = chartData.map((d, index) => {
                 const x = (index / (chartData.length - 1)) * width;
                 const y = height - padding - ((d.price - minPrice) / (maxPrice - minPrice)) * (height - padding * 2);
@@ -715,12 +700,11 @@ document.addEventListener("DOMContentLoaded", () => {
 
             const areaPoints = `0,${height} ${points} ${width},${height}`;
 
-            // ビットコイン・オレンジの線を引くSVG生成
             const svgHtml = `
                 <svg class="chart-svg" viewBox="0 0 ${width} ${height}" preserveAspectRatio="none" style="width:100%; height:100%; display:block;">
                     <defs>
                         <linearGradient id="chart-gradient" x1="0" y1="0" x2="0" y2="1">
-                            <stop offset="0%" stop-color="rgba(247, 147, 26, 0.2)" /> <!-- オレンジ半透明 -->
+                            <stop offset="0%" stop-color="rgba(247, 147, 26, 0.2)" /> 
                             <stop offset="100%" stop-color="rgba(247, 147, 26, 0)" />
                         </linearGradient>
                     </defs>
@@ -730,14 +714,12 @@ document.addEventListener("DOMContentLoaded", () => {
             `;
             document.getElementById('btc-chart').innerHTML = svgHtml;
 
-            // --- ツールチップ（マウス/タッチ連動）のプログラム ---
             const wrapper = document.getElementById('chart-wrapper');
             const tooltip = document.getElementById('chart-tooltip');
             const crosshair = document.getElementById('chart-crosshair');
             const tooltipDate = document.getElementById('tooltip-date');
             const tooltipPrice = document.getElementById('tooltip-price');
 
-            // マウスや指が動いた時の処理
             const handleMove = (e) => {
                 const rect = wrapper.getBoundingClientRect();
                 const clientX = e.touches ? e.touches[0].clientX : e.clientX;
@@ -809,7 +791,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     async function fetchNetworkStats() {
         try {
-            const [heightRes, feeRes] = await Promise.all([
+            const[heightRes, feeRes] = await Promise.all([
                 fetch('https://mempool.space/api/blocks/tip/height'),
                 fetch('https://mempool.space/api/v1/fees/recommended')
             ]);
@@ -919,11 +901,12 @@ document.addEventListener("DOMContentLoaded", () => {
     connectBitflyer();
 
     // ==========================================
-    // 3. コンバーター（相互計算）ロジック
+    // 3. コンバーター（相互計算）ロジック - カンマ対応版
     // ==========================================
     function updateConverter() {
         if (rateUsd === 0 || rateJpy === 0) return;
-        const val = parseFloat(document.getElementById(`input-${currentFocus}`).value) || 0;
+        const valStr = document.getElementById(`input-${currentFocus}`).value;
+        const val = parseFloat(valStr.replace(/,/g, '')) || 0;
         calculateFrom(currentFocus, val);
     }
 
@@ -936,21 +919,50 @@ document.addEventListener("DOMContentLoaded", () => {
         else if (type === 'jpy') btc = value / rateJpy;
         else if (type === 'usd') btc = value / rateUsd;
 
-        if (type !== 'sats') document.getElementById('input-sats').value = (btc * 100000000).toFixed(0);
-        if (type !== 'btc') document.getElementById('input-btc').value = Number(btc.toFixed(8)); 
-        if (type !== 'jpy') document.getElementById('input-jpy').value = (btc * rateJpy).toFixed(2);
-        if (type !== 'usd') document.getElementById('input-usd').value = (btc * rateUsd).toFixed(2);
+        // 現在「入力中のボックス」以外に、カンマ付きの美しい数値を流し込む
+        if (type !== 'sats') {
+            document.getElementById('input-sats').value = (btc * 100000000).toLocaleString('en-US', {maximumFractionDigits: 0});
+        }
+        if (type !== 'btc') {
+            document.getElementById('input-btc').value = btc.toLocaleString('en-US', {maximumFractionDigits: 8}); 
+        }
+        if (type !== 'jpy') {
+            document.getElementById('input-jpy').value = (btc * rateJpy).toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+        }
+        if (type !== 'usd') {
+            document.getElementById('input-usd').value = (btc * rateUsd).toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+        }
     }
 
     const inputTypes =['sats', 'btc', 'jpy', 'usd'];
     inputTypes.forEach(type => {
         const el = document.getElementById(`input-${type}`);
         if (el) {
+            
+            // ① タップした時（フォーカス）: カンマを消して、数字を編集しやすくする
+            el.addEventListener('focus', (e) => {
+                currentFocus = type;
+                e.target.value = e.target.value.replace(/,/g, '');
+            });
+            
+            // ② 入力中 : カンマなしの生データを裏側で計算し、他のボックスにリアルタイム反映
             el.addEventListener('input', (e) => {
                 currentFocus = type;
-                calculateFrom(type, parseFloat(e.target.value) || 0);
+                const val = parseFloat(e.target.value.replace(/,/g, '')) || 0;
+                calculateFrom(type, val);
             });
-            el.addEventListener('focus', () => { currentFocus = type; });
+            
+            // ③ タップをやめた時（ブラー）: 入力していたボックス自身にも美しいカンマをつける
+            el.addEventListener('blur', (e) => {
+                const val = parseFloat(e.target.value.replace(/,/g, '')) || 0;
+                if (type === 'sats') {
+                    e.target.value = val.toLocaleString('en-US', {maximumFractionDigits: 0});
+                } else if (type === 'btc') {
+                    e.target.value = val.toLocaleString('en-US', {maximumFractionDigits: 8});
+                } else {
+                    e.target.value = val.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+                }
+            });
         }
     });
 
