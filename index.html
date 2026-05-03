@@ -3,216 +3,248 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Global Market & Crypto Dashboard</title>
+    <title>THE MARKET OVERVIEW | VOGUE Style</title>
+    
+    <!-- Google Fonts: VOGUE風のエレガントなセリフ体と、モダンなサンセリフ体 -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Montserrat:wght@300;400;500;700&display=swap" rel="stylesheet">
+    
     <style>
-        /* ベースカラーと変数定義 */
         :root {
-            --bg-dark: #0f1115;
-            --card-bg: rgba(25, 29, 38, 0.6);
-            --border-color: rgba(255, 255, 255, 0.08);
-            --text-main: #f1f5f9;
-            --text-sub: #94a3b8;
-            --accent-green: #10b981;
-            --accent-red: #ef4444;
-            --glow-green: rgba(16, 185, 129, 0.4);
-            --glow-red: rgba(239, 68, 68, 0.4);
-        }
-
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
+            --bg-color: #FBFBFB; /* わずかに温かみのある大理石のような白 */
+            --border-color: #E0E0E0;
+            --text-main: #111111; /* 漆黒 */
+            --text-sub: #888888;
+            --font-heading: 'Playfair Display', serif;
+            --font-body: 'Montserrat', sans-serif;
+            --up-color: #1d5733; /* エレガントな深緑 */
+            --down-color: #8a1e1e; /* エレガントな深紅 */
         }
 
         body {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-            background-color: var(--bg-dark);
-            background-image: 
-                radial-gradient(circle at 15% 0%, rgba(30, 41, 59, 0.8), transparent 40%),
-                radial-gradient(circle at 85% 100%, rgba(15, 23, 42, 0.8), transparent 40%);
+            background-color: var(--bg-color);
             color: var(--text-main);
-            min-height: 100vh;
-            padding: 2rem 1rem;
+            font-family: var(--font-body);
+            margin: 0;
+            padding: 4rem 1.5rem;
+            -webkit-font-smoothing: antialiased;
         }
 
         .container {
-            max-width: 1100px;
+            max-width: 1200px;
             margin: 0 auto;
         }
 
-        h1 {
+        /* 雑誌の表紙のようなヘッダー */
+        .header-section {
             text-align: center;
-            font-size: 2.2rem;
-            font-weight: 800;
-            margin-bottom: 2.5rem;
-            letter-spacing: 0.05em;
-            background: linear-gradient(135deg, #fff 0%, #94a3b8 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
+            margin-bottom: 4rem;
+            border-bottom: 1px solid var(--text-main);
+            padding-bottom: 2rem;
+        }
+
+        h1 {
+            font-family: var(--font-heading);
+            font-size: 3.5rem;
+            font-weight: 700;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            margin: 0 0 0.5rem 0;
+        }
+
+        .subtitle {
+            font-size: 0.85rem;
+            letter-spacing: 0.2em;
+            color: var(--text-sub);
+            text-transform: uppercase;
         }
 
         .dashboard {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-            gap: 1.5rem;
+            grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+            gap: 2rem;
         }
 
+        /* 洗練されたシャープなカード */
         .card {
-            background: var(--card-bg);
+            background: #FFFFFF;
             border: 1px solid var(--border-color);
-            border-radius: 16px;
-            padding: 1.5rem;
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            box-shadow: 0 4px 24px -1px rgba(0, 0, 0, 0.2);
-            height: 200px;
+            padding: 2rem;
+            height: 250px;
             display: flex;
             flex-direction: column;
             justify-content: space-between;
-            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            position: relative;
+            border-radius: 0; /* 角丸をなくしエッジを効かせる */
+            transition: all 0.5s cubic-bezier(0.165, 0.84, 0.44, 1);
         }
 
         .card:hover {
+            border-color: var(--text-main);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.04);
             transform: translateY(-4px);
-            box-shadow: 0 10px 30px -1px rgba(0, 0, 0, 0.4);
-        }
-
-        /* TradingView用カード特例 */
-        .tv-card {
-            padding: 0;
-            position: relative;
-            overflow: hidden;
-        }
-
-        /* ★ここが原因でした：コンテナに高さを指定して潰れないようにする */
-        .tradingview-widget-container {
-            width: 100%;
-            height: 100%;
-            flex-grow: 1;
-        }
-
-        .card-header-custom {
-            position: absolute;
-            top: 12px;
-            right: 12px;
-            z-index: 10;
-            font-size: 0.75rem;
-            color: #fff;
-            font-weight: 600;
-            background: rgba(0, 0, 0, 0.6);
-            backdrop-filter: blur(4px);
-            padding: 4px 10px;
-            border-radius: 20px;
-            border: 1px solid rgba(255,255,255,0.1);
-            pointer-events: none;
         }
 
         .card-header {
             display: flex;
             justify-content: space-between;
-            align-items: center;
-            font-weight: 600;
-            color: var(--text-sub);
-            font-size: 0.95rem;
+            align-items: flex-start;
+        }
+
+        .card-title {
+            font-family: var(--font-heading);
+            font-size: 1.4rem;
+            font-style: italic;
+            color: var(--text-main);
         }
 
         .live-indicator {
-            color: var(--accent-green);
-            font-size: 0.75rem;
-            animation: pulse 2s infinite;
+            font-size: 0.65rem;
+            letter-spacing: 0.15em;
+            font-weight: 600;
+            color: var(--text-main);
             display: flex;
             align-items: center;
-            gap: 4px;
+            gap: 6px;
+            text-transform: uppercase;
         }
 
-        @keyframes pulse {
-            0% { opacity: 1; }
-            50% { opacity: 0.4; }
-            100% { opacity: 1; }
+        .live-dot {
+            width: 6px;
+            height: 6px;
+            background-color: var(--text-main);
+            border-radius: 50%;
+            animation: blink 2s infinite;
+        }
+
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.2; }
         }
 
         .card-body {
-            font-size: 2.6rem;
-            font-weight: 700;
+            font-size: 3.2rem;
+            font-weight: 300;
             text-align: right;
-            font-variant-numeric: tabular-nums;
-            letter-spacing: -1px;
-            transition: color 0.3s ease, text-shadow 0.3s ease;
+            letter-spacing: -0.02em;
+            margin-top: auto;
+            transition: color 0.4s ease;
         }
 
         .sats-container {
             display: flex;
             flex-direction: column;
-            gap: 0.8rem;
+            gap: 1.2rem;
             margin-top: auto;
         }
 
         .sats-item {
             display: flex;
             justify-content: space-between;
-            align-items: flex-end;
+            align-items: baseline;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 0.5rem;
         }
 
         .sats-label {
-            font-size: 0.9rem;
+            font-size: 0.85rem;
             color: var(--text-sub);
-            font-weight: 500;
-            margin-bottom: 4px;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
         }
 
         .sats-value {
             font-size: 1.8rem;
-            font-weight: 700;
-            font-variant-numeric: tabular-nums;
-            transition: color 0.3s ease, text-shadow 0.3s ease;
+            font-weight: 300;
         }
 
-        @keyframes flashUp {
-            0% { color: var(--accent-green); text-shadow: 0 0 15px var(--glow-green); }
-            100% { color: var(--text-main); text-shadow: none; }
+        /* --- TradingView カード特例（真っ黒問題の解決部分） --- */
+        .tv-card {
+            padding: 0;
+            overflow: hidden;
         }
 
-        @keyframes flashDown {
-            0% { color: var(--accent-red); text-shadow: 0 0 15px var(--glow-red); }
-            100% { color: var(--text-main); text-shadow: none; }
+        /* 絶対配置で強制的に親枠にフィットさせる */
+        .tradingview-wrapper {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
         }
 
-        .flash-up { animation: flashUp 0.8s ease-out; }
-        .flash-down { animation: flashDown 0.8s ease-out; }
+        .tradingview-widget-container {
+            width: 100% !important;
+            height: 100% !important;
+        }
+
+        .chart-label {
+            position: absolute;
+            top: 1.5rem;
+            left: 1.5rem;
+            z-index: 10;
+            font-family: var(--font-heading);
+            font-style: italic;
+            font-size: 1.3rem;
+            color: var(--text-main);
+            background: rgba(255, 255, 255, 0.7);
+            padding: 2px 10px;
+            backdrop-filter: blur(8px);
+            pointer-events: none;
+        }
+
+        /* 派手な発光をやめ、文字色がスッと変わるエレガントなアニメーション */
+        .flash-up { animation: elegantUp 1.2s ease-out; }
+        .flash-down { animation: elegantDown 1.2s ease-out; }
+
+        @keyframes elegantUp {
+            0% { color: var(--up-color); }
+            100% { color: var(--text-main); }
+        }
+
+        @keyframes elegantDown {
+            0% { color: var(--down-color); }
+            100% { color: var(--text-main); }
+        }
 
         .loading {
-            font-size: 1.2rem !important;
-            color: var(--text-sub);
+            color: var(--border-color);
+            font-size: 1.5rem;
         }
 
         @media (max-width: 768px) {
-            h1 { font-size: 1.8rem; }
-            .card { height: 180px; }
-            .card-body { font-size: 2.2rem; }
-            .sats-value { font-size: 1.5rem; }
+            h1 { font-size: 2.2rem; }
+            .card { height: 220px; }
+            .card-body { font-size: 2.4rem; }
+            .dashboard { gap: 1rem; }
         }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <h1>Market Overview</h1>
+    <div class="header-section">
+        <h1>The Market Overview</h1>
+        <div class="subtitle">Real-time Financial & Crypto Indices</div>
+    </div>
+
     <div class="dashboard">
 
         <!-- 1. BTC/USD -->
         <div class="card">
             <div class="card-header">
-                <span>Bitcoin (BTC/USD)</span>
-                <span class="live-indicator">● LIVE</span>
+                <span class="card-title">Bitcoin (BTC/USD)</span>
+                <span class="live-indicator"><span class="live-dot"></span>LIVE</span>
             </div>
-            <div class="card-body loading" id="btc-usd">Connecting...</div>
+            <div class="card-body loading" id="btc-usd">...</div>
         </div>
 
         <!-- 2. 1 Sats -->
         <div class="card">
             <div class="card-header">
-                <span>1 Satoshi (1/1億 BTC)</span>
-                <span class="live-indicator">● LIVE</span>
+                <span class="card-title">1 Satoshi</span>
+                <span class="live-indicator"><span class="live-dot"></span>LIVE</span>
             </div>
             <div class="sats-container">
                 <div class="sats-item">
@@ -226,87 +258,95 @@
             </div>
         </div>
 
-        <!-- 3. S&P 500 (OANDAのCFD銘柄に変更しリアルタイム化) -->
+        <!-- 3. S&P 500 (OANDA) -->
         <div class="card tv-card">
-            <div class="card-header-custom">S&P 500</div>
-            <div class="tradingview-widget-container">
-                <div class="tradingview-widget-container__widget"></div>
-                <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/tv-widget-mini-symbol-overview.js" async>
-                {
-                    "symbol": "OANDA:SPX500USD",
-                    "width": "100%",
-                    "height": "100%",
-                    "locale": "ja",
-                    "dateRange": "1D",
-                    "colorTheme": "dark",
-                    "isTransparent": true,
-                    "autosize": true,
-                    "largeChartUrl": ""
-                }
-                </script>
+            <div class="chart-label">S&P 500</div>
+            <div class="tradingview-wrapper">
+                <div class="tradingview-widget-container">
+                    <div class="tradingview-widget-container__widget"></div>
+                    <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/tv-widget-mini-symbol-overview.js" async>
+                    {
+                        "symbol": "OANDA:SPX500USD",
+                        "width": "100%",
+                        "height": "100%",
+                        "locale": "ja",
+                        "dateRange": "1D",
+                        "colorTheme": "light",
+                        "isTransparent": true,
+                        "autosize": true,
+                        "largeChartUrl": ""
+                    }
+                    </script>
+                </div>
             </div>
         </div>
 
-        <!-- 4. 日経平均株価 (OANDAのCFD銘柄に変更しリアルタイム化) -->
+        <!-- 4. 日経平均株価 (OANDA) -->
         <div class="card tv-card">
-            <div class="card-header-custom">日経平均株価</div>
-            <div class="tradingview-widget-container">
-                <div class="tradingview-widget-container__widget"></div>
-                <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/tv-widget-mini-symbol-overview.js" async>
-                {
-                    "symbol": "OANDA:JP225JPY",
-                    "width": "100%",
-                    "height": "100%",
-                    "locale": "ja",
-                    "dateRange": "1D",
-                    "colorTheme": "dark",
-                    "isTransparent": true,
-                    "autosize": true,
-                    "largeChartUrl": ""
-                }
-                </script>
+            <div class="chart-label">Nikkei 225</div>
+            <div class="tradingview-wrapper">
+                <div class="tradingview-widget-container">
+                    <div class="tradingview-widget-container__widget"></div>
+                    <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/tv-widget-mini-symbol-overview.js" async>
+                    {
+                        "symbol": "OANDA:JP225JPY",
+                        "width": "100%",
+                        "height": "100%",
+                        "locale": "ja",
+                        "dateRange": "1D",
+                        "colorTheme": "light",
+                        "isTransparent": true,
+                        "autosize": true,
+                        "largeChartUrl": ""
+                    }
+                    </script>
+                </div>
             </div>
         </div>
 
-        <!-- 5. 米国債10年金利 (そのまま) -->
+        <!-- 5. 米国債10年金利 -->
         <div class="card tv-card">
-            <div class="card-header-custom">米国債10年金利</div>
-            <div class="tradingview-widget-container">
-                <div class="tradingview-widget-container__widget"></div>
-                <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/tv-widget-mini-symbol-overview.js" async>
-                {
-                    "symbol": "TVC:US10Y",
-                    "width": "100%",
-                    "height": "100%",
-                    "locale": "ja",
-                    "dateRange": "1D",
-                    "colorTheme": "dark",
-                    "isTransparent": true,
-                    "autosize": true,
-                    "largeChartUrl": ""
-                }
-                </script>
+            <div class="chart-label">US 10Y Yield</div>
+            <div class="tradingview-wrapper">
+                <div class="tradingview-widget-container">
+                    <div class="tradingview-widget-container__widget"></div>
+                    <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/tv-widget-mini-symbol-overview.js" async>
+                    {
+                        "symbol": "TVC:US10Y",
+                        "width": "100%",
+                        "height": "100%",
+                        "locale": "ja",
+                        "dateRange": "1D",
+                        "colorTheme": "light",
+                        "isTransparent": true,
+                        "autosize": true,
+                        "largeChartUrl": ""
+                    }
+                    </script>
+                </div>
             </div>
         </div>
 
-        <!-- 6. 日本国債10年金利 (そのまま) -->
+        <!-- 6. 日本国債10年金利 -->
         <div class="card tv-card">
-            <div class="card-header-custom">日本国債10年金利</div>
-            <div class="tradingview-widget-container">
-                <div class="tradingview-widget-container__widget"></div>
-                <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/tv-widget-mini-symbol-overview.js" async>
-                {
-                    "symbol": "TVC:JP10Y",
-                    "width": "100%",
-                    "height": "100%",
-                    "locale": "ja",
-                    "dateRange": "1D",
-                    "colorTheme": "dark",
-                    "isTransparent": true,
-                    "autosize": true,
-                    "largeChartUrl": ""
-                }
-                </script>
+            <div class="chart-label">JP 10Y Yield</div>
+            <div class="tradingview-wrapper">
+                <div class="tradingview-widget-container">
+                    <div class="tradingview-widget-container__widget"></div>
+                    <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/tv-widget-mini-symbol-overview.js" async>
+                    {
+                        "symbol": "TVC:JP10Y",
+                        "width": "100%",
+                        "height": "100%",
+                        "locale": "ja",
+                        "dateRange": "1D",
+                        "colorTheme": "light",
+                        "isTransparent": true,
+                        "autosize": true,
+                        "largeChartUrl": ""
+                    }
+                    </script>
+                </div>
             </div>
         </div>
 
