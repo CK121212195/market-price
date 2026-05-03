@@ -56,6 +56,9 @@
             margin: 0;
             padding: 4rem 1.5rem;
             -webkit-font-smoothing: antialiased;
+            /* 横揺れ・はみ出しを完全に防ぐ設定 */
+            overflow-x: hidden;
+            width: 100%;
         }
 
         .container {
@@ -93,7 +96,6 @@
         /* --- Live Market Cards --- */
         .dashboard {
             display: grid;
-            /* スマホで横にはみ出さないように 100% の制限を追加 */
             grid-template-columns: repeat(auto-fit, minmax(min(100%, 340px), 1fr));
             gap: 2rem;
             margin-bottom: 4rem;
@@ -203,7 +205,7 @@
             color: var(--text-main);
         }
 
-        /* --- Custom Chart Section (VOGUE Style + Interactive) --- */
+        /* --- Custom Chart Section --- */
         .chart-section { margin-bottom: 5rem; }
 
         .chart-header {
@@ -253,7 +255,7 @@
             align-items: flex-end;
             font-size: 0.65rem;
             color: var(--text-sub);
-            pointer-events: none; /* マウスの邪魔をしない */
+            pointer-events: none; 
             padding-bottom: 5px;
         }
         
@@ -342,6 +344,7 @@
             border: 1px solid var(--border-color);
             padding: 1.5rem 3rem;
             margin-bottom: 5rem;
+            width: 100%;
         }
 
         .input-group {
@@ -365,6 +368,9 @@
 
         .input-group input {
             flex-grow: 1;
+            /* 桁数が増えても親要素を押し広げない魔法のコード */
+            min-width: 0; 
+            width: 100%;
             border: none;
             outline: none;
             background: transparent;
@@ -464,11 +470,11 @@
         .game-name { font-size: 0.75rem; font-weight: 600; letter-spacing: 0.05em; }
 
         /* ====================================================
-           ★ スマホ向け完全レスポンシブ設定 ★
+           ★ スマホ向け完全レスポンシブ設定（修正版） ★
         ==================================================== */
         @media (max-width: 768px) {
             body { padding: 2rem 1rem; }
-            h1 { font-size: 2rem; } /* タイトルを縮小 */
+            h1 { font-size: 1.8rem; } /* タイトルを少し小さくして見切れ防止 */
             .subtitle { font-size: 0.7rem; }
             
             .dashboard { gap: 1rem; margin-bottom: 3rem; }
@@ -476,22 +482,26 @@
             .card-body { font-size: 2.2rem; }
             .sats-value { font-size: 1.5rem; }
             
-            .chart-wrapper { height: 160px; } /* チャートの高さをスマホ向けに調整 */
+            .chart-wrapper { height: 160px; } 
             
             .stats-section { margin-bottom: 3rem; }
             .section-header { font-size: 1.6rem; }
             .stats-row-label { font-size: 0.75rem; }
             .stats-row-value { font-size: 1.1rem; }
             
-            .converter-box { padding: 1.2rem 1rem; margin-bottom: 3rem; } /* 余白を大幅カット */
-            .input-group input { font-size: 1.5rem; padding: 0 0.5rem; }
-            .currency-icon { font-size: 1.2rem; width: 30px; }
+            .converter-box { padding: 1.2rem 1rem; margin-bottom: 3rem; width: 100%; } 
+            
+            /* 入力ボックス内の数字がはみ出さないようにサイズ調整 */
+            .input-group input { font-size: 1.2rem; padding: 0 0.5rem; }
+            .currency-icon { font-size: 1.1rem; width: 25px; }
+            .currency-label { font-size: 0.75rem; width: 35px; }
             
             .actions-wrapper { gap: 1rem; flex-direction: column; }
-            .action-box { min-width: 100%; padding: 1.5rem; } /* ボタンエリアを縦並びに */
+            .action-box { width: 100%; min-width: 100%; padding: 1.5rem 1rem; }
+            .btn { padding: 0.8rem 1rem; font-size: 0.75rem; } /* ボタンの横幅も調整 */
             
             .games-grid { gap: 1rem; }
-            .game-card { width: 45%; height: 90px; } /* ゲームカードをスマホで2列に */
+            .game-card { width: 45%; height: 90px; }
         }
     </style>
 </head>
@@ -932,7 +942,7 @@ document.addEventListener("DOMContentLoaded", () => {
         if (type !== 'usd') document.getElementById('input-usd').value = (btc * rateUsd).toFixed(2);
     }
 
-    const inputTypes = ['sats', 'btc', 'jpy', 'usd'];
+    const inputTypes =['sats', 'btc', 'jpy', 'usd'];
     inputTypes.forEach(type => {
         const el = document.getElementById(`input-${type}`);
         if (el) {
@@ -954,8 +964,6 @@ function shareTwitter() {
     const satsJpy = document.getElementById('sats-jpy').innerText;
     const url = window.location.href;
     
-    // URLとハッシュタグがくっついてOGPカードが読み込まれない問題を回避するため、
-    // パラメータを分けずに1つのテキストとして組み立て、意図的に2行分の改行（\n\n）を挟みます。
     const text = `Experience the pulse of the market.\n\nBitcoin: ${btcUsd}\n1 Satoshi: ${satsJpy}\n\n${url}\n\n#Bitcoin #LightningNetwork #Crypto`;
     
     window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}`, '_blank');
