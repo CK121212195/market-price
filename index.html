@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Global Market & Crypto Dashboard</title>
+    <style>
+        /* ベースカラーと変数定義 */
+        :root {
+            --bg-dark: #0f1115;
+            --card-bg: rgba(25, 29, 38, 0.6);
+            --border-color: rgba(255, 255, 255, 0.08);
+            --text-main: #f1f5f9;
+            --text-sub: #94a3b8;
+            --accent-green: #10b981;
+            --accent-red: #ef4444;
+            --glow-green: rgba(16, 185, 129, 0.4);
+            --glow-red: rgba(239, 68, 68, 0.4);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background-color: var(--bg-dark);
+            /* おしゃれな背景グラデーション */
+            background-image: 
+                radial-gradient(circle at 15% 0%, rgba(30, 41, 59, 0.8), transparent 40%),
+                radial-gradient(circle at 85% 100%, rgba(15, 23, 42, 0.8), transparent 40%);
+            color: var(--text-main);
+            min-height: 100vh;
+            padding: 2rem 1rem;
+        }
+
+        .container {
+            max-width: 1100px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            text-align: center;
+            font-size: 2.2rem;
+            font-weight: 800;
+            margin-bottom: 2.5rem;
+            letter-spacing: 0.05em;
+            background: linear-gradient(135deg, #fff 0%, #94a3b8 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        /* グリッドレイアウト */
+        .dashboard {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 1.5rem;
+        }
+
+        /* グラスモーフィズム調のカード */
+        .card {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 1.5rem;
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            box-shadow: 0 4px 24px -1px rgba(0, 0, 0, 0.2);
+            height: 200px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 10px 30px -1px rgba(0, 0, 0, 0.4);
+        }
+
+        /* TradingView用カード特例 */
+        .tv-card {
+            padding: 0;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .card-header-custom {
+            position: absolute;
+            top: 12px;
+            right: 12px;
+            z-index: 10;
+            font-size: 0.75rem;
+            color: #fff;
+            font-weight: 600;
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(4px);
+            padding: 4px 10px;
+            border-radius: 20px;
+            border: 1px solid rgba(255,255,255,0.1);
+            pointer-events: none;
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-weight: 600;
+            color: var(--text-sub);
+            font-size: 0.95rem;
+        }
+
+        /* ライブインジケーターのアニメーション */
+        .live-indicator {
+            color: var(--accent-green);
+            font-size: 0.75rem;
+            animation: pulse 2s infinite;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.4; }
+            100% { opacity: 1; }
+        }
+
+        .card-body {
+            font-size: 2.6rem;
+            font-weight: 700;
+            text-align: right;
+            font-variant-numeric: tabular-nums;
+            letter-spacing: -1px;
+            transition: color 0.3s ease, text-shadow 0.3s ease;
+        }
+
+        /* Satoshi用レイアウト */
+        .sats-container {
+            display: flex;
+            flex-direction: column;
+            gap: 0.8rem;
+            margin-top: auto;
+        }
+
+        .sats-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+        }
+
+        .sats-label {
+            font-size: 0.9rem;
+            color: var(--text-sub);
+            font-weight: 500;
+            margin-bottom: 4px;
+        }
+
+        .sats-value {
+            font-size: 1.8rem;
+            font-weight: 700;
+            font-variant-numeric: tabular-nums;
+            transition: color 0.3s ease, text-shadow 0.3s ease;
+        }
+
+        /* 価格変動時の発光アニメーション */
+        @keyframes flashUp {
+            0% { color: var(--accent-green); text-shadow: 0 0 15px var(--glow-green); }
+            100% { color: var(--text-main); text-shadow: none; }
+        }
+
+        @keyframes flashDown {
+            0% { color: var(--accent-red); text-shadow: 0 0 15px var(--glow-red); }
+            100% { color: var(--text-main); text-shadow: none; }
+        }
+
+        .flash-up { animation: flashUp 0.8s ease-out; }
+        .flash-down { animation: flashDown 0.8s ease-out; }
+
+        .loading {
+            font-size: 1.2rem !important;
+            color: var(--text-sub);
+        }
+
+        @media (max-width: 768px) {
+            h1 { font-size: 1.8rem; }
+            .card { height: 180px; }
+            .card-body { font-size: 2.2rem; }
+            .sats-value { font-size: 1.5rem; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Market Overview</h1>
+    <div class="dashboard">
+
+        <!-- 1. BTC/USD カード (Binance WebSocket) -->
+        <div class="card">
+            <div class="card-header">
+                <span>Bitcoin (BTC/USD)</span>
+                <span class="live-indicator">● LIVE</span>
+            </div>
+            <div class="card-body loading" id="btc-usd">Connecting...</div>
+        </div>
+
+        <!-- 2. 1 Sats カード (WebSocketから自動計算) -->
+        <div class="card">
+            <div class="card-header">
+                <span>1 Satoshi (1/1億 BTC)</span>
+                <span class="live-indicator">● LIVE</span>
+            </div>
+            <div class="sats-container">
+                <div class="sats-item">
+                    <span class="sats-label">USD</span>
+                    <span class="sats-value loading" id="sats-usd">...</span>
+                </div>
+                <div class="sats-item">
+                    <span class="sats-label">JPY</span>
+                    <span class="sats-value loading" id="sats-jpy">...</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- 3. S&P 500 (TradingView) -->
+        <div class="card tv-card">
+            <div class="card-header-custom">S&P 500</div>
+            <div class="tradingview-widget-container">
+                <div class="tradingview-widget-container__widget"></div>
+                <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/tv-widget-mini-symbol-overview.js" async>
+                {
+                    "symbol": "SP:SPX",
+                    "width": "100%",
+                    "height": "100%",
+                    "locale": "ja",
+                    "dateRange": "1D",
+                    "colorTheme": "dark",
+                    "isTransparent": true,
+                    "autosize": true,
+                    "largeChartUrl": ""
+                }
+                </script>
+            </div>
+        </div>
+
+        <!-- 4. 日経平均株価 (TradingView) -->
+        <div class="card tv-card">
+            <div class="card-header-custom">日経平均株価</div>
+            <div class="tradingview-widget-container">
+                <div class="tradingview-widget-container__widget"></div>
+                <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/tv-widget-mini-symbol-overview.js" async>
+                {
+                    "symbol": "TVC:NI225",
+                    "width": "100%",
+                    "height": "100%",
+                    "locale": "ja",
+                    "dateRange": "1D",
+                    "colorTheme": "dark",
+                    "isTransparent": true,
+                    "autosize": true,
+                    "largeChartUrl": ""
+                }
+                </script>
+            </div>
+        </div>
+
+        <!-- 5. 米国債10年金利 (TradingView) -->
+        <div class="card tv-card">
+            <div class="card-header-custom">米国債10年金利</div>
+            <div class="tradingview-widget-container">
+                <div class="tradingview-widget-container__widget"></div>
+                <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/tv-widget-mini-symbol-overview.js" async>
+                {
+                    "symbol": "TVC:US10Y",
+                    "width": "100%",
+                    "height": "100%",
+                    "locale": "ja",
+                    "dateRange": "1D",
+                    "colorTheme": "dark",
+                    "isTransparent": true,
+                    "autosize": true,
+                    "largeChartUrl": ""
+                }
+                </script>
+            </div>
+        </div>
+
+        <!-- 6. 日本国債10年金利 (TradingView) -->
+        <div class="card tv-card">
+            <div class="card-header-custom">日本国債10年金利</div>
+            <div class="tradingview-widget-container">
+                <div class="tradingview-widget-container__widget"></div>
+                <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/tv-widget-mini-symbol-overview.js" async>
+                {
+                    "symbol": "TVC:JP10Y",
+                    "width": "100%",
+                    "height": "100%",
+                    "locale": "ja",
+                    "dateRange": "1D",
+                    "colorTheme": "dark",
+                    "isTransparent": true,
+                    "autosize": true,
+                    "largeChartUrl": ""
+                }
+                </script>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+    
+    // 値が変動した時のチカチカ（発光）アニメーション管理
+    function flashElement(el, className) {
+        el.classList.remove('flash-up', 'flash-down', 'loading');
+        void el.offsetWidth; // アニメーションのリセット用
+        el.classList.add(className);
+    }
+
+    // --- 1. Binance WebSocket接続 (BTC/USD および Sats/USD計算) ---
+    const btcUsdEl = document.getElementById('btc-usd');
+    const satsUsdEl = document.getElementById('sats-usd');
+    let lastBtcUsd = 0;
+
+    function connectBinance() {
+        const binanceWs = new WebSocket('wss://stream.binance.com:9443/ws/btcusdt@ticker');
+        
+        binanceWs.onmessage = (event) => {
+            const data = JSON.parse(event.data);
+            const currentPrice = parseFloat(data.c);
+            
+            // BTC/USD の表示更新
+            btcUsdEl.innerText = `$${currentPrice.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
+            
+            // 1 Satsあたりの USD を計算 (1億分の1)
+            const satsUsd = currentPrice / 100000000;
+            satsUsdEl.innerText = `$${satsUsd.toFixed(6)}`;
+
+            if (lastBtcUsd !== 0) {
+                if (currentPrice > lastBtcUsd) {
+                    flashElement(btcUsdEl, 'flash-up');
+                    flashElement(satsUsdEl, 'flash-up');
+                } else if (currentPrice < lastBtcUsd) {
+                    flashElement(btcUsdEl, 'flash-down');
+                    flashElement(satsUsdEl, 'flash-down');
+                }
+            }
+            lastBtcUsd = currentPrice;
+        };
+
+        // 切断された場合の自動再接続
+        binanceWs.onclose = () => setTimeout(connectBinance, 5000); 
+    }
+    connectBinance();
+
+    // --- 2. bitFlyer WebSocket接続 (Sats/JPY計算用) ---
+    // 日本円レートのリアルタイム性を担保するため、日本最大のbitFlyerのAPIを利用します
+    const satsJpyEl = document.getElementById('sats-jpy');
+    let lastBtcJpy = 0;
+
+    function connectBitflyer() {
+        const bitflyerWs = new WebSocket('wss://ws.lightstream.bitflyer.com/json-rpc');
+        
+        bitflyerWs.onopen = () => {
+            bitflyerWs.send(JSON.stringify({
+                method: "subscribe",
+                params: { channel: "lightning_ticker_BTC_JPY" }
+            }));
+        };
+
+        bitflyerWs.onmessage = (event) => {
+            const response = JSON.parse(event.data);
+            if (response.params && response.params.message) {
+                const currentPrice = response.params.message.ltp;
+                
+                // 1 Satsあたりの JPY を計算 (1億分の1)
+                const satsJpy = currentPrice / 100000000;
+                satsJpyEl.innerText = `¥${satsJpy.toFixed(4)}`;
+
+                if (lastBtcJpy !== 0) {
+                    if (currentPrice > lastBtcJpy) {
+                        flashElement(satsJpyEl, 'flash-up');
+                    } else if (currentPrice < lastBtcJpy) {
+                        flashElement(satsJpyEl, 'flash-down');
+                    }
+                }
+                lastBtcJpy = currentPrice;
+            }
+        };
+
+        // 切断された場合の自動再接続
+        bitflyerWs.onclose = () => setTimeout(connectBitflyer, 5000); 
+    }
+    connectBitflyer();
+
+});
+</script>
+</body>
+</html>
