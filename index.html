@@ -532,7 +532,7 @@
         </div>
     </div>
 
-    <!-- 1-YEAR TREND CHART (オレンジ化・軸・ツールチップ追加) -->
+    <!-- 1-YEAR TREND CHART -->
     <div class="chart-section">
         <div class="chart-header">
             <span class="chart-title">Price Trend</span>
@@ -706,7 +706,6 @@ document.addEventListener("DOMContentLoaded", () => {
             const areaPoints = `0,${height} ${points} ${width},${height}`;
 
             // ビットコイン・オレンジの線を引くSVG生成
-            // スマホの画面幅に合わせて伸縮するよう preserveAspectRatio="none" に設定し、線の太さを維持する
             const svgHtml = `
                 <svg class="chart-svg" viewBox="0 0 ${width} ${height}" preserveAspectRatio="none" style="width:100%; height:100%; display:block;">
                     <defs>
@@ -731,37 +730,30 @@ document.addEventListener("DOMContentLoaded", () => {
             // マウスや指が動いた時の処理
             const handleMove = (e) => {
                 const rect = wrapper.getBoundingClientRect();
-                // スマホのタッチ座標か、PCのマウス座標かを判定
                 const clientX = e.touches ? e.touches[0].clientX : e.clientX;
                 let x = clientX - rect.left;
                 
-                // 枠外にはみ出さないように制限
                 if (x < 0) x = 0;
                 if (x > rect.width) x = rect.width;
                 
-                // カーソルのX座標から「何日目のデータか（インデックス）」を計算
                 const index = Math.round((x / rect.width) * (chartData.length - 1));
                 const dataPoint = chartData[index];
                 if (!dataPoint) return;
 
-                // ツールチップの内容を更新
                 const date = new Date(dataPoint.time);
                 tooltipDate.innerText = date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
                 tooltipPrice.innerText = `$${dataPoint.price.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
                 
-                // 表示して位置を合わせる
                 tooltip.style.display = 'block';
                 crosshair.style.display = 'block';
                 crosshair.style.left = `${x}px`;
                 
-                // ツールチップが画面端で見切れないように調整
                 const tooltipWidth = tooltip.offsetWidth || 100;
                 let tooltipX = x;
                 if (tooltipX < tooltipWidth / 2) tooltipX = tooltipWidth / 2;
                 if (tooltipX > rect.width - tooltipWidth / 2) tooltipX = rect.width - tooltipWidth / 2;
                 tooltip.style.left = `${tooltipX}px`;
 
-                // ツールチップのY座標を、その日のチャート線の高さに合わせる
                 const y = height - padding - ((dataPoint.price - minPrice) / (maxPrice - minPrice)) * (height - padding * 2);
                 const displayY = (y / height) * rect.height;
                 tooltip.style.top = `${displayY}px`;
@@ -772,11 +764,8 @@ document.addEventListener("DOMContentLoaded", () => {
                 crosshair.style.display = 'none';
             };
 
-            // PC用イベント
             wrapper.addEventListener('mousemove', handleMove);
             wrapper.addEventListener('mouseleave', handleLeave);
-            
-            // スマホ用イベント (指でなぞる操作)
             wrapper.addEventListener('touchmove', (e) => handleMove(e), { passive: true });
             wrapper.addEventListener('touchend', handleLeave);
 
@@ -786,9 +775,7 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     }
     
-    // チャート描画の実行
     drawChart();
-
 
     // ==========================================
     // 1. ネットワーク統計データの取得と計算
@@ -828,7 +815,7 @@ document.addEventListener("DOMContentLoaded", () => {
             
             updateMarketCap();
 
-            const statIds = ['stat-block', 'stat-fee', 'stat-supply', 'stat-mcap'];
+            const statIds =['stat-block', 'stat-fee', 'stat-supply', 'stat-mcap'];
             statIds.forEach(id => {
                 const el = document.getElementById(id);
                 if (el) el.classList.remove('loading');
@@ -839,7 +826,7 @@ document.addEventListener("DOMContentLoaded", () => {
             document.getElementById('stat-block').innerText = "Unavailable";
             document.getElementById('stat-fee').innerText = "Unavailable";
             
-            const statIds = ['stat-block', 'stat-fee', 'stat-supply', 'stat-mcap'];
+            const statIds =['stat-block', 'stat-fee', 'stat-supply', 'stat-mcap'];
             statIds.forEach(id => {
                 const el = document.getElementById(id);
                 if (el) el.classList.remove('loading');
@@ -965,12 +952,13 @@ document.addEventListener("DOMContentLoaded", () => {
 function shareTwitter() {
     const btcUsd = document.getElementById('btc-usd').innerText;
     const satsJpy = document.getElementById('sats-jpy').innerText;
-    
-    const text = `Experience the pulse of the market.\n\nBitcoin: ${btcUsd}\n1 Satoshi: ${satsJpy}\n\n`;
-    const hashtags = "Bitcoin,LightningNetwork,Crypto";
     const url = window.location.href;
     
-    window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(url)}&hashtags=${hashtags}`, '_blank');
+    // URLとハッシュタグがくっついてOGPカードが読み込まれない問題を回避するため、
+    // パラメータを分けずに1つのテキストとして組み立て、意図的に2行分の改行（\n\n）を挟みます。
+    const text = `Experience the pulse of the market.\n\nBitcoin: ${btcUsd}\n1 Satoshi: ${satsJpy}\n\n${url}\n\n#Bitcoin #LightningNetwork #Crypto`;
+    
+    window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}`, '_blank');
 }
 
 // ==========================================
