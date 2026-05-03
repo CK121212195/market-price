@@ -3,16 +3,30 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>THE MARKET OVERVIEW | VOGUE Style</title>
     
-    <!-- Google Fonts: VOGUE風のエレガントなセリフ体と、モダンなサンセリフ体 -->
+    <!-- Google Analytics Tag -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-X1J77SKSG3"></script>
+    <script>
+      window.dataLayer = window.dataLayer ||[];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-X1J77SKSG3');
+    </script>
+
+    <!-- Meta Tags -->
+    <title>THE BITCOIN OVERVIEW | VOGUE Style</title>
+    <link rel="icon" href="favicon.png" type="image/png">
+    <meta property="og:title" content="THE BITCOIN OVERVIEW | VOGUE Style">
+    <meta property="og:description" content="Real-time Bitcoin Dashboard & Converter">
+    <meta property="og:image" content="og-image.png">
+
+    <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Montserrat:wght@200;300;400;500&display=swap" rel="stylesheet">
     
     <style>
         :root {
-            /* コントラストを際立たせた純白と漆黒 */
             --bg-color: #FFFFFF;
             --border-color: #EAEAEA;
             --text-main: #000000;
@@ -20,9 +34,8 @@
             --font-heading: 'Playfair Display', serif;
             --font-body: 'Montserrat', sans-serif;
             
-            /* プラダを着た悪魔風の鮮烈でクッキリしたハイブランド・カラー */
-            --up-color: #00A651; /* ボッテガ・グリーン / 鮮明な緑 */
-            --down-color: #E3000F; /* ルブタン・レッド / 鮮烈な赤 */
+            --up-color: #00A651; /* ボッテガ・グリーン */
+            --down-color: #E3000F; /* ルブタン・レッド */
         }
 
         body {
@@ -35,20 +48,21 @@
         }
 
         .container {
-            max-width: 1200px;
+            max-width: 1000px;
             margin: 0 auto;
         }
 
+        /* --- Header --- */
         .header-section {
             text-align: center;
-            margin-bottom: 4rem;
+            margin-bottom: 3rem;
             border-bottom: 1px solid var(--text-main);
             padding-bottom: 2rem;
         }
 
         h1 {
             font-family: var(--font-heading);
-            font-size: 3.8rem;
+            font-size: 3.5rem;
             font-weight: 700;
             letter-spacing: 0.08em;
             text-transform: uppercase;
@@ -63,10 +77,12 @@
             font-weight: 300;
         }
 
+        /* --- Live Market Cards --- */
         .dashboard {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
-            gap: 2.5rem;
+            gap: 2rem;
+            margin-bottom: 4rem;
         }
 
         .card {
@@ -77,7 +93,6 @@
             display: flex;
             flex-direction: column;
             justify-content: space-between;
-            position: relative;
             transition: all 0.5s cubic-bezier(0.165, 0.84, 0.44, 1);
         }
 
@@ -119,29 +134,19 @@
             animation: blink 2s infinite;
         }
 
-        @keyframes blink {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.1; }
-        }
+        @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.1; } }
 
         .card-body {
             font-size: 3.4rem;
-            font-weight: 200; /* より細く繊細なフォントウェイト */
+            font-weight: 200;
             text-align: right;
             letter-spacing: -0.03em;
             margin-top: auto;
             transition: color 0.4s ease;
         }
 
-        /* --- 前日比の上昇・下落カラー --- */
-        .price-up {
-            color: var(--up-color) !important;
-            text-shadow: 0 0 20px rgba(0, 166, 81, 0.1);
-        }
-        .price-down {
-            color: var(--down-color) !important;
-            text-shadow: 0 0 20px rgba(227, 0, 15, 0.1);
-        }
+        .price-up { color: var(--up-color) !important; text-shadow: 0 0 20px rgba(0, 166, 81, 0.1); }
+        .price-down { color: var(--down-color) !important; text-shadow: 0 0 20px rgba(227, 0, 15, 0.1); }
 
         .sats-container {
             display: flex;
@@ -165,37 +170,185 @@
             text-transform: uppercase;
         }
 
-        .sats-value {
-            font-size: 1.8rem;
-            font-weight: 300;
-            transition: color 0.4s ease;
+        .sats-value { font-size: 1.8rem; font-weight: 300; transition: color 0.4s ease; }
+        .loading { color: var(--border-color) !important; font-size: 1.5rem; font-style: italic; }
+
+        /* --- Converter Section --- */
+        .section-header {
+            font-family: var(--font-heading);
+            font-size: 2rem;
+            font-style: italic;
+            margin-bottom: 1.5rem;
+            text-align: center;
         }
 
-        .loading {
-            color: var(--border-color) !important;
-            font-size: 1.5rem;
-            font-style: italic;
+        .converter-box {
+            background: #FAFAFA;
+            border: 1px solid var(--border-color);
+            padding: 1.5rem 3rem;
+            margin-bottom: 4rem;
         }
+
+        .input-group {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 1px solid var(--border-color);
+            padding: 1.2rem 0;
+            transition: border-color 0.3s;
+        }
+        
+        .input-group:focus-within { border-bottom-color: var(--text-main); }
+        .input-group:last-child { border-bottom: none; }
+
+        .currency-icon {
+            font-size: 1.5rem;
+            width: 40px;
+            color: var(--text-sub);
+            font-family: var(--font-heading);
+        }
+
+        .input-group input {
+            flex-grow: 1;
+            border: none;
+            outline: none;
+            background: transparent;
+            text-align: right;
+            font-size: 2.2rem;
+            font-family: var(--font-body);
+            font-weight: 300;
+            color: var(--text-main);
+            padding: 0 1.5rem;
+        }
+
+        /* スピナーを隠す */
+        input[type=number]::-webkit-inner-spin-button, 
+        input[type=number]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
+        input[type=number] { -moz-appearance: textfield; }
+
+        .currency-label {
+            font-size: 0.9rem;
+            color: var(--text-sub);
+            width: 50px;
+            text-align: right;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+        }
+
+        /* --- Actions (Tip & Share) --- */
+        .actions-wrapper {
+            display: flex;
+            gap: 2rem;
+            margin-bottom: 5rem;
+            flex-wrap: wrap;
+        }
+
+        .action-box {
+            flex: 1;
+            min-width: 300px;
+            border: 1px solid var(--border-color);
+            padding: 2.5rem;
+            text-align: center;
+        }
+
+        .action-box h3 {
+            font-family: var(--font-heading);
+            font-style: italic;
+            font-size: 1.5rem;
+            margin-top: 0;
+            margin-bottom: 1.5rem;
+        }
+
+        .btn-group {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            background: transparent;
+            border: 1px solid var(--text-main);
+            color: var(--text-main);
+            padding: 0.8rem 1.5rem;
+            font-family: var(--font-body);
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            text-decoration: none;
+        }
+
+        .btn:hover { background: var(--text-main); color: var(--bg-color); }
+        .btn-primary { background: var(--text-main); color: var(--bg-color); }
+        .btn-primary:hover { background: transparent; color: var(--text-main); }
+
+        /* --- Other Games Section --- */
+        .games-section {
+            border-top: 1px solid var(--border-color);
+            padding-top: 3rem;
+            text-align: center;
+        }
+
+        .games-title {
+            font-size: 0.75rem;
+            letter-spacing: 0.3em;
+            color: var(--text-sub);
+            text-transform: uppercase;
+            margin-bottom: 2rem;
+        }
+
+        .games-grid {
+            display: flex;
+            justify-content: center;
+            gap: 1.5rem;
+            flex-wrap: wrap;
+        }
+
+        .game-card {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            width: 150px;
+            height: 110px;
+            background: var(--bg-color);
+            border: 1px solid var(--border-color);
+            text-decoration: none;
+            color: var(--text-main);
+            transition: all 0.3s ease;
+        }
+
+        .game-card:hover {
+            background: var(--text-main);
+            color: var(--bg-color);
+            transform: translateY(-3px);
+        }
+
+        .game-icon { font-size: 1.8rem; margin-bottom: 0.8rem; }
+        .game-name { font-size: 0.75rem; font-weight: 500; letter-spacing: 0.05em; }
 
         @media (max-width: 768px) {
             h1 { font-size: 2.2rem; }
             .card { height: 200px; padding: 1.5rem; }
             .card-body { font-size: 2.4rem; }
-            .dashboard { gap: 1.5rem; }
+            .input-group input { font-size: 1.6rem; }
         }
     </style>
 </head>
 <body>
 
 <div class="container">
+    
+    <!-- HEADER -->
     <div class="header-section">
-        <h1>The Market Overview</h1>
-        <div class="subtitle">Real-time Financial & Crypto Indices</div>
+        <h1>The Bitcoin Overview</h1>
+        <div class="subtitle">Real-time Dashboard & Converter</div>
     </div>
 
+    <!-- LIVE MARKET -->
     <div class="dashboard">
-
-        <!-- 1. BTC/USD -->
         <div class="card">
             <div class="card-header">
                 <span class="card-title">Bitcoin (BTC/USD)</span>
@@ -204,7 +357,6 @@
             <div class="card-body loading" id="btc-usd">Fetching...</div>
         </div>
 
-        <!-- 2. 1 Sats -->
         <div class="card">
             <div class="card-header">
                 <span class="card-title">1 Satoshi</span>
@@ -221,164 +373,193 @@
                 </div>
             </div>
         </div>
-
-        <!-- 3. S&P 500 -->
-        <div class="card">
-            <div class="card-header">
-                <span class="card-title">S&P 500</span>
-                <span class="live-indicator">DAILY</span>
-            </div>
-            <div class="card-body loading" id="sp500">Fetching...</div>
-        </div>
-
-        <!-- 4. 日経平均株価 -->
-        <div class="card">
-            <div class="card-header">
-                <span class="card-title">Nikkei 225</span>
-                <span class="live-indicator">DAILY</span>
-            </div>
-            <div class="card-body loading" id="nikkei">Fetching...</div>
-        </div>
-
-        <!-- 5. 米国債10年金利 -->
-        <div class="card">
-            <div class="card-header">
-                <span class="card-title">US 10Y Yield</span>
-                <span class="live-indicator">DAILY</span>
-            </div>
-            <div class="card-body loading" id="us10y">Fetching...</div>
-        </div>
-
-        <!-- 6. ドル円為替レート -->
-        <div class="card">
-            <div class="card-header">
-                <span class="card-title">USD / JPY</span>
-                <span class="live-indicator">DAILY</span>
-            </div>
-            <div class="card-body loading" id="usdjpy">Fetching...</div>
-        </div>
-
     </div>
+
+    <!-- CONVERTER -->
+    <h2 class="section-header">Live Converter</h2>
+    <div class="converter-box">
+        <div class="input-group">
+            <span class="currency-icon">₿</span>
+            <input type="number" id="input-sats" value="100">
+            <span class="currency-label">sats</span>
+        </div>
+        <div class="input-group">
+            <span class="currency-icon">₿</span>
+            <input type="number" id="input-btc">
+            <span class="currency-label">BTC</span>
+        </div>
+        <div class="input-group">
+            <span class="currency-icon">¥</span>
+            <input type="number" id="input-jpy">
+            <span class="currency-label">JPY</span>
+        </div>
+        <div class="input-group">
+            <span class="currency-icon">$</span>
+            <input type="number" id="input-usd">
+            <span class="currency-label">USD</span>
+        </div>
+    </div>
+
+    <!-- ACTIONS (Tip & Share) -->
+    <div class="actions-wrapper">
+        <div class="action-box">
+            <h3>Support with Lightning ⚡️</h3>
+            <div class="btn-group">
+                <!-- Wallet of Satoshi のアドレスを設定済み -->
+                <button class="btn" onclick="sendTip(100, 'brashridge65@walletofsatoshi.com')">100 sats</button>
+                <button class="btn" onclick="sendTip(1000, 'brashridge65@walletofsatoshi.com')">1,000 sats</button>
+                <button class="btn" onclick="sendTip(10000, 'brashridge65@walletofsatoshi.com')">10,000 sats</button>
+            </div>
+        </div>
+        
+        <div class="action-box">
+            <h3>Share the Market</h3>
+            <div class="btn-group">
+                <button class="btn btn-primary" onclick="shareTwitter()">Share on X</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- OTHER GAMES -->
+    <div class="games-section">
+        <div class="games-title">Other Games</div>
+        <div class="games-grid">
+            <a href="https://ck121212195.github.io/Plinko-Bitcoin/" target="_blank" class="game-card">
+                <span class="game-icon">🎰</span>
+                <span class="game-name">Plinko Bitcoin</span>
+            </a>
+            <a href="https://ck121212195.github.io/Bitcoin-Run/" target="_blank" class="game-card">
+                <span class="game-icon">🏃‍♂️</span>
+                <span class="game-name">Bitcoin Run</span>
+            </a>
+            <a href="https://ck121212195.github.io/omikuji_japan_only/" target="_blank" class="game-card">
+                <span class="game-icon">⛩️</span>
+                <span class="game-name">Omikuji</span>
+            </a>
+        </div>
+    </div>
+
 </div>
 
 <script>
 document.addEventListener("DOMContentLoaded", () => {
     
-    // ==========================================
-    // 1. 仮想通貨のリアルタイムデータ (Binance & bitFlyer)
-    // ==========================================
+    // --- グローバルレート ---
+    let rateUsd = 0;
+    let rateJpy = 0;
+    let currentFocus = 'sats'; 
+
     const btcUsdEl = document.getElementById('btc-usd');
     const satsUsdEl = document.getElementById('sats-usd');
     const satsJpyEl = document.getElementById('sats-jpy');
 
+    // ==========================================
+    // 1. WebSocket データ取得
+    // ==========================================
     function connectBinance() {
         const binanceWs = new WebSocket('wss://stream.binance.com:9443/ws/btcusdt@ticker');
         binanceWs.onmessage = (event) => {
             const data = JSON.parse(event.data);
-            const currentPrice = parseFloat(data.c);
+            rateUsd = parseFloat(data.c);
             const priceChange = parseFloat(data.p); 
             
-            btcUsdEl.innerText = `$${currentPrice.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
+            btcUsdEl.innerText = `$${rateUsd.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
             
-            const satsUsd = currentPrice / 100000000;
+            const satsUsd = rateUsd / 100000000;
             satsUsdEl.innerText = `$${satsUsd.toFixed(6)}`;
 
             btcUsdEl.className = 'card-body';
             satsUsdEl.className = 'sats-value';
-            satsJpyEl.className = 'sats-value'; 
-
-            // プラダを着た悪魔カラーの適用
             if (priceChange > 0) {
                 btcUsdEl.classList.add('price-up');
                 satsUsdEl.classList.add('price-up');
-                satsJpyEl.classList.add('price-up');
             } else if (priceChange < 0) {
                 btcUsdEl.classList.add('price-down');
                 satsUsdEl.classList.add('price-down');
-                satsJpyEl.classList.add('price-down');
             }
+
+            updateConverter();
         };
         binanceWs.onclose = () => setTimeout(connectBinance, 5000); 
     }
-    connectBinance();
 
     function connectBitflyer() {
         const bitflyerWs = new WebSocket('wss://ws.lightstream.bitflyer.com/json-rpc');
         bitflyerWs.onopen = () => {
-            bitflyerWs.send(JSON.stringify({
-                method: "subscribe",
-                params: { channel: "lightning_ticker_BTC_JPY" }
-            }));
+            bitflyerWs.send(JSON.stringify({ method: "subscribe", params: { channel: "lightning_ticker_BTC_JPY" } }));
         };
         bitflyerWs.onmessage = (event) => {
             const response = JSON.parse(event.data);
             if (response.params && response.params.message) {
-                const currentPrice = response.params.message.ltp;
-                const satsJpy = currentPrice / 100000000;
+                rateJpy = response.params.message.ltp;
+                const satsJpy = rateJpy / 100000000;
                 satsJpyEl.innerText = `¥${satsJpy.toFixed(4)}`;
+
+                satsJpyEl.className = 'sats-value';
+                if (btcUsdEl.classList.contains('price-up')) satsJpyEl.classList.add('price-up');
+                else if (btcUsdEl.classList.contains('price-down')) satsJpyEl.classList.add('price-down');
+
+                updateConverter();
             }
         };
         bitflyerWs.onclose = () => setTimeout(connectBitflyer, 5000); 
     }
+
+    connectBinance();
     connectBitflyer();
 
     // ==========================================
-    // 2. 株価・金利・為替データ (CNBC APIを利用)
-    // N/Aを回避するプロキシ不要の裏ルートエンドポイント
+    // 2. コンバーター（相互計算）ロジック
     // ==========================================
-    function fetchCNBCData() {
-        // scriptタグを使ったJSONPリクエストでCORSブロックを無効化
-        const script = document.createElement('script');
-        script.src = "https://quote.cnbc.com/quote-html-webservice/restQuote/symbolType/symbol?symbols=.SPX,.N225,US10Y-US,JPY=&requestMethod=itv&noform=1&output=json&callback=processCNBCData";
-        document.body.appendChild(script);
-        
-        // 取得完了後にスクリプトタグをお掃除
-        script.onload = () => script.remove();
+    function updateConverter() {
+        if (rateUsd === 0 || rateJpy === 0) return;
+        const val = parseFloat(document.getElementById(`input-${currentFocus}`).value) || 0;
+        calculateFrom(currentFocus, val);
     }
 
-    // CNBCからデータが届いた時に実行される関数
-    window.processCNBCData = function(data) {
-        if (!data || !data.FormattedQuoteResult || !data.FormattedQuoteResult.FormattedQuote) return;
+    function calculateFrom(type, value) {
+        if (rateUsd === 0 || rateJpy === 0) return;
         
-        const quotes = data.FormattedQuoteResult.FormattedQuote;
-        
-        // CNBCのティッカーとHTMLのIDの紐付け
-        const symbolMap = {
-            '.SPX': { id: 'sp500', prefix: '', suffix: '' },
-            '.N225': { id: 'nikkei', prefix: '¥', suffix: '' },
-            'US10Y-US': { id: 'us10y', prefix: '', suffix: '%' },
-            'JPY=': { id: 'usdjpy', prefix: '¥', suffix: '' }
-        };
+        let btc = 0;
+        if (type === 'sats') btc = value / 100000000;
+        else if (type === 'btc') btc = value;
+        else if (type === 'jpy') btc = value / rateJpy;
+        else if (type === 'usd') btc = value / rateUsd;
 
-        const quoteArray = Array.isArray(quotes) ? quotes : [quotes];
-
-        quoteArray.forEach(quote => {
-            const mapInfo = symbolMap[quote.symbol];
-            if (!mapInfo) return;
-
-            const el = document.getElementById(mapInfo.id);
-            if (!el) return;
-
-            // 価格の表示
-            const lastPriceStr = quote.last; 
-            el.innerText = `${mapInfo.prefix}${lastPriceStr}${mapInfo.suffix}`;
-            
-            // 前日比の色付け
-            const changeVal = parseFloat(quote.change.replace(/,/g, ''));
-            el.className = 'card-body'; 
-            if (changeVal > 0) {
-                el.classList.add('price-up');
-            } else if (changeVal < 0) {
-                el.classList.add('price-down');
-            }
+        if (type !== 'sats') document.getElementById('input-sats').value = (btc * 100000000).toFixed(0);
+        if (type !== 'btc') document.getElementById('input-btc').value = Number(btc.toFixed(8)); 
+        if (type !== 'jpy') document.getElementById('input-jpy').value = (btc * rateJpy).toFixed(2);
+        if (type !== 'usd') document.getElementById('input-usd').value = (btc * rateUsd).toFixed(2);
+    }['sats', 'btc', 'jpy', 'usd'].forEach(type => {
+        const el = document.getElementById(`input-${type}`);
+        el.addEventListener('input', (e) => {
+            currentFocus = type;
+            calculateFrom(type, parseFloat(e.target.value) || 0);
         });
-    };
-
-    // 初回取得と、5分ごとの自動更新
-    fetchCNBCData();
-    setInterval(fetchCNBCData, 5 * 60 * 1000);
+        el.addEventListener('focus', () => { currentFocus = type; });
+    });
 
 });
+
+// ==========================================
+// 3. Twitter シェア機能
+// ==========================================
+function shareTwitter() {
+    const btcUsd = document.getElementById('btc-usd').innerText;
+    const satsJpy = document.getElementById('sats-jpy').innerText;
+    const text = `The Bitcoin Overview\n\n現在のビットコイン価格は ${btcUsd} 🚀\n1 Satoshi = ${satsJpy}\n\n`;
+    const url = window.location.href;
+    window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(url)}`, '_blank');
+}
+
+// ==========================================
+// 4. ライトニング 投げ銭機能
+// ==========================================
+function sendTip(amount, address) {
+    // ユーザーのウォレットアプリを起動して、アドレスを送金先にセットします
+    // ※ 金額(amount)の引き継ぎ可否はユーザーが使用するウォレットの種類に依存します
+    window.location.href = `lightning:${address}`;
+}
 </script>
 </body>
 </html>
