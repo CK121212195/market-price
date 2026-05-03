@@ -13,7 +13,7 @@
       gtag('config', 'G-X1J77SKSG3');
     </script>
 
-    <!-- Meta Tags (OGP画像のバグを修正しました) -->
+    <!-- Meta Tags -->
     <title>THE BITCOIN OVERVIEW | VOGUE Style</title>
     <link rel="icon" href="favicon.png" type="image/png">
     
@@ -47,6 +47,8 @@
             --btc-orange: #F7931A; /* ビットコイン・オレンジ */
         }
 
+        * { box-sizing: border-box; }
+
         body {
             background-color: var(--bg-color);
             color: var(--text-main);
@@ -76,6 +78,7 @@
             letter-spacing: 0.08em;
             text-transform: uppercase;
             margin: 0 0 0.5rem 0;
+            line-height: 1.1;
         }
 
         .subtitle {
@@ -84,12 +87,14 @@
             color: var(--text-sub);
             text-transform: uppercase;
             font-weight: 400;
+            margin-top: 10px;
         }
 
         /* --- Live Market Cards --- */
         .dashboard {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+            /* スマホで横にはみ出さないように 100% の制限を追加 */
+            grid-template-columns: repeat(auto-fit, minmax(min(100%, 340px), 1fr));
             gap: 2rem;
             margin-bottom: 4rem;
         }
@@ -188,59 +193,6 @@
         
         .loading { color: var(--border-color) !important; font-size: 1.5rem; font-style: italic; }
 
-        /* --- Custom Chart Section (VOGUE Style) --- */
-        .chart-section {
-            margin-bottom: 5rem;
-        }
-
-        .chart-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-end;
-            margin-bottom: 1.5rem;
-            border-bottom: 1px solid var(--border-color);
-            padding-bottom: 0.5rem;
-        }
-
-        .chart-title {
-            font-family: var(--font-heading);
-            font-size: 1.5rem;
-            font-style: italic;
-            color: var(--text-main);
-        }
-
-        .chart-duration {
-            font-size: 0.65rem;
-            letter-spacing: 0.2em;
-            font-weight: 600;
-            color: var(--text-sub);
-            text-transform: uppercase;
-        }
-
-        .chart-container {
-            width: 100%;
-            height: 180px; /* チャートの高さ */
-            position: relative;
-        }
-
-        .chart-svg {
-            width: 100%;
-            height: 100%;
-            overflow: visible;
-        }
-
-        .chart-line {
-            fill: none;
-            stroke: var(--text-main); /* 漆黒の極細ライン */
-            stroke-width: 1.5;
-            stroke-linecap: round;
-            stroke-linejoin: round;
-        }
-
-        .chart-area {
-            fill: url(#chart-gradient);
-        }
-
         /* --- Section Titles --- */
         .section-header {
             font-family: var(--font-heading);
@@ -251,15 +203,115 @@
             color: var(--text-main);
         }
 
-        /* --- Network Statistics --- */
-        .stats-section {
-            margin-bottom: 5rem;
+        /* --- Custom Chart Section (VOGUE Style + Interactive) --- */
+        .chart-section { margin-bottom: 5rem; }
+
+        .chart-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            margin-bottom: 1rem;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 0.5rem;
         }
 
-        .stats-list {
+        .chart-title {
+            font-family: var(--font-heading);
+            font-size: 1.5rem;
+            font-style: italic;
+        }
+
+        .chart-duration {
+            font-size: 0.65rem;
+            letter-spacing: 0.2em;
+            font-weight: 600;
+            color: var(--text-sub);
+            text-transform: uppercase;
+        }
+
+        .chart-wrapper {
+            position: relative;
+            width: 100%;
+            height: 200px;
+            cursor: crosshair;
+        }
+
+        .chart-svg-container {
+            width: 100%;
+            height: 100%;
+            border-bottom: 1px solid var(--border-color);
+            position: relative;
+        }
+
+        /* X軸・Y軸のラベル設定 */
+        .chart-y-axis {
+            position: absolute;
+            top: 0; bottom: 0; right: 0;
             display: flex;
             flex-direction: column;
+            justify-content: space-between;
+            align-items: flex-end;
+            font-size: 0.65rem;
+            color: var(--text-sub);
+            pointer-events: none; /* マウスの邪魔をしない */
+            padding-bottom: 5px;
         }
+        
+        .chart-x-axis {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.65rem;
+            color: var(--text-sub);
+            padding-top: 8px;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+        }
+
+        /* インタラクティブなクロスヘア(縦線)とツールチップ */
+        #chart-crosshair {
+            display: none;
+            position: absolute;
+            top: 0; bottom: 0;
+            width: 1px;
+            background-color: var(--text-sub);
+            opacity: 0.4;
+            pointer-events: none;
+        }
+
+        #chart-tooltip {
+            display: none;
+            position: absolute;
+            background: var(--text-main);
+            color: var(--bg-color);
+            padding: 8px 12px;
+            border-radius: 4px;
+            pointer-events: none;
+            transform: translate(-50%, -120%);
+            text-align: center;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+            white-space: nowrap;
+            z-index: 10;
+        }
+
+        #tooltip-date {
+            font-size: 0.65rem;
+            color: #CCCCCC;
+            margin-bottom: 3px;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+        }
+
+        #tooltip-price {
+            font-size: 1rem;
+            font-weight: 600;
+            font-family: var(--font-heading);
+            letter-spacing: 0.05em;
+        }
+
+        /* --- Network Statistics --- */
+        .stats-section { margin-bottom: 5rem; }
+
+        .stats-list { display: flex; flex-direction: column; }
 
         .stats-row {
             display: flex;
@@ -362,12 +414,7 @@
             margin-bottom: 1.5rem;
         }
 
-        .btn-group {
-            display: flex;
-            justify-content: center;
-            gap: 1rem;
-            flex-wrap: wrap;
-        }
+        .btn-group { display: flex; justify-content: center; gap: 1rem; flex-wrap: wrap; }
 
         .btn {
             background: transparent;
@@ -389,28 +436,10 @@
         .btn-primary:hover { background: transparent; color: var(--text-main); }
 
         /* --- Other Games Section --- */
-        .games-section {
-            border-top: 1px solid var(--border-color);
-            padding-top: 3rem;
-            text-align: center;
-        }
-
-        .games-title {
-            font-size: 0.75rem;
-            letter-spacing: 0.3em;
-            color: var(--text-sub);
-            font-weight: 500;
-            text-transform: uppercase;
-            margin-bottom: 2rem;
-        }
-
-        .games-grid {
-            display: flex;
-            justify-content: center;
-            gap: 1.5rem;
-            flex-wrap: wrap;
-        }
-
+        .games-section { border-top: 1px solid var(--border-color); padding-top: 3rem; text-align: center; }
+        .games-title { font-size: 0.75rem; letter-spacing: 0.3em; color: var(--text-sub); font-weight: 500; text-transform: uppercase; margin-bottom: 2rem; }
+        .games-grid { display: flex; justify-content: center; gap: 1.5rem; flex-wrap: wrap; }
+        
         .game-card {
             display: flex;
             flex-direction: column;
@@ -434,12 +463,35 @@
         .game-icon { font-size: 1.8rem; margin-bottom: 0.8rem; }
         .game-name { font-size: 0.75rem; font-weight: 600; letter-spacing: 0.05em; }
 
+        /* ====================================================
+           ★ スマホ向け完全レスポンシブ設定 ★
+        ==================================================== */
         @media (max-width: 768px) {
-            h1 { font-size: 2.2rem; }
-            .card { height: 200px; padding: 1.5rem; }
-            .card-body { font-size: 2.4rem; }
-            .input-group input { font-size: 1.6rem; }
-            .converter-box { padding: 1.5rem; }
+            body { padding: 2rem 1rem; }
+            h1 { font-size: 2rem; } /* タイトルを縮小 */
+            .subtitle { font-size: 0.7rem; }
+            
+            .dashboard { gap: 1rem; margin-bottom: 3rem; }
+            .card { height: auto; min-height: 160px; padding: 1.5rem; }
+            .card-body { font-size: 2.2rem; }
+            .sats-value { font-size: 1.5rem; }
+            
+            .chart-wrapper { height: 160px; } /* チャートの高さをスマホ向けに調整 */
+            
+            .stats-section { margin-bottom: 3rem; }
+            .section-header { font-size: 1.6rem; }
+            .stats-row-label { font-size: 0.75rem; }
+            .stats-row-value { font-size: 1.1rem; }
+            
+            .converter-box { padding: 1.2rem 1rem; margin-bottom: 3rem; } /* 余白を大幅カット */
+            .input-group input { font-size: 1.5rem; padding: 0 0.5rem; }
+            .currency-icon { font-size: 1.2rem; width: 30px; }
+            
+            .actions-wrapper { gap: 1rem; flex-direction: column; }
+            .action-box { min-width: 100%; padding: 1.5rem; } /* ボタンエリアを縦並びに */
+            
+            .games-grid { gap: 1rem; }
+            .game-card { width: 45%; height: 90px; } /* ゲームカードをスマホで2列に */
         }
     </style>
 </head>
@@ -480,14 +532,37 @@
         </div>
     </div>
 
-    <!-- 1-YEAR TREND CHART (完全自作SVGの爆速お洒落チャート) -->
+    <!-- 1-YEAR TREND CHART (オレンジ化・軸・ツールチップ追加) -->
     <div class="chart-section">
         <div class="chart-header">
             <span class="chart-title">Price Trend</span>
             <span class="chart-duration">Past 1 Year</span>
         </div>
-        <div class="chart-container" id="btc-chart">
-            <div class="loading" style="text-align: center; line-height: 180px;">Drawing...</div>
+        
+        <div class="chart-wrapper" id="chart-wrapper">
+            <!-- Y軸の価格ラベル -->
+            <div class="chart-y-axis">
+                <span id="chart-y-max"></span>
+                <span id="chart-y-min"></span>
+            </div>
+            
+            <!-- インタラクティブなツールチップ -->
+            <div id="chart-crosshair"></div>
+            <div id="chart-tooltip">
+                <div id="tooltip-date"></div>
+                <div id="tooltip-price"></div>
+            </div>
+
+            <!-- SVGチャート描画エリア -->
+            <div class="chart-svg-container" id="btc-chart">
+                <div class="loading" style="text-align: center; line-height: 200px;">Drawing...</div>
+            </div>
+        </div>
+        
+        <!-- X軸の日付ラベル -->
+        <div class="chart-x-axis">
+            <span id="chart-x-start"></span>
+            <span id="chart-x-end">Today</span>
         </div>
     </div>
 
@@ -593,53 +668,121 @@ document.addEventListener("DOMContentLoaded", () => {
     const satsJpyEl = document.getElementById('sats-jpy');
 
     // ==========================================
-    // 0. 超軽量 1-Year Trend Chart (SVG描画)
+    // 0. 超軽量 1-Year Trend Chart (オレンジ化 & ホバー対応)
     // ==========================================
     async function drawChart() {
         try {
-            // Binanceの無料APIから過去365日分の終値を取得
             const res = await fetch('https://api.binance.com/api/v3/klines?symbol=BTCUSDT&interval=1d&limit=365');
             const data = await res.json();
             
-            // 終値（インデックス4）の配列を作成
-            const prices = data.map(candle => parseFloat(candle[4]));
+            // データ整形（時間と価格の配列を作る）
+            const chartData = data.map(candle => ({
+                time: candle[0],
+                price: parseFloat(candle[4])
+            }));
+            
+            const prices = chartData.map(d => d.price);
             const minPrice = Math.min(...prices);
             const maxPrice = Math.max(...prices);
             
-            // SVGキャンバスの設定
-            const width = 1000;
-            const height = 180;
-            const padding = 10;
+            // Y軸（価格）、X軸（日付）のラベルを書き込む
+            document.getElementById('chart-y-max').innerText = `$${maxPrice.toLocaleString(undefined, {maximumFractionDigits: 0})}`;
+            document.getElementById('chart-y-min').innerText = `$${minPrice.toLocaleString(undefined, {maximumFractionDigits: 0})}`;
             
-            // 座標（ポイント）の計算
-            const points = prices.map((price, index) => {
-                const x = (index / (prices.length - 1)) * width;
-                const y = height - padding - ((price - minPrice) / (maxPrice - minPrice)) * (height - padding * 2);
+            const startDate = new Date(chartData[0].time);
+            document.getElementById('chart-x-start').innerText = startDate.toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
+
+            const width = 1000;
+            const height = 200;
+            const padding = 15;
+            
+            // チャート線の座標計算
+            const points = chartData.map((d, index) => {
+                const x = (index / (chartData.length - 1)) * width;
+                const y = height - padding - ((d.price - minPrice) / (maxPrice - minPrice)) * (height - padding * 2);
                 return `${x},${y}`;
             }).join(' ');
 
-            // 塗りつぶしエリア用の座標
             const areaPoints = `0,${height} ${points} ${width},${height}`;
 
-            // HTMLにSVG（ベクター画像）を直接挿入
+            // ビットコイン・オレンジの線を引くSVG生成
+            // スマホの画面幅に合わせて伸縮するよう preserveAspectRatio="none" に設定し、線の太さを維持する
             const svgHtml = `
-                <svg class="chart-svg" viewBox="0 0 ${width} ${height}" preserveAspectRatio="none">
+                <svg class="chart-svg" viewBox="0 0 ${width} ${height}" preserveAspectRatio="none" style="width:100%; height:100%; display:block;">
                     <defs>
                         <linearGradient id="chart-gradient" x1="0" y1="0" x2="0" y2="1">
-                            <stop offset="0%" stop-color="rgba(0, 0, 0, 0.08)" />
-                            <stop offset="100%" stop-color="rgba(0, 0, 0, 0)" />
+                            <stop offset="0%" stop-color="rgba(247, 147, 26, 0.2)" /> <!-- オレンジ半透明 -->
+                            <stop offset="100%" stop-color="rgba(247, 147, 26, 0)" />
                         </linearGradient>
                     </defs>
-                    <polygon class="chart-area" points="${areaPoints}" />
-                    <polyline class="chart-line" points="${points}" />
+                    <polygon points="${areaPoints}" fill="url(#chart-gradient)" />
+                    <polyline points="${points}" fill="none" stroke="var(--btc-orange)" stroke-width="2" vector-effect="non-scaling-stroke" stroke-linejoin="round" />
                 </svg>
             `;
-            
             document.getElementById('btc-chart').innerHTML = svgHtml;
+
+            // --- ツールチップ（マウス/タッチ連動）のプログラム ---
+            const wrapper = document.getElementById('chart-wrapper');
+            const tooltip = document.getElementById('chart-tooltip');
+            const crosshair = document.getElementById('chart-crosshair');
+            const tooltipDate = document.getElementById('tooltip-date');
+            const tooltipPrice = document.getElementById('tooltip-price');
+
+            // マウスや指が動いた時の処理
+            const handleMove = (e) => {
+                const rect = wrapper.getBoundingClientRect();
+                // スマホのタッチ座標か、PCのマウス座標かを判定
+                const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+                let x = clientX - rect.left;
+                
+                // 枠外にはみ出さないように制限
+                if (x < 0) x = 0;
+                if (x > rect.width) x = rect.width;
+                
+                // カーソルのX座標から「何日目のデータか（インデックス）」を計算
+                const index = Math.round((x / rect.width) * (chartData.length - 1));
+                const dataPoint = chartData[index];
+                if (!dataPoint) return;
+
+                // ツールチップの内容を更新
+                const date = new Date(dataPoint.time);
+                tooltipDate.innerText = date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+                tooltipPrice.innerText = `$${dataPoint.price.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
+                
+                // 表示して位置を合わせる
+                tooltip.style.display = 'block';
+                crosshair.style.display = 'block';
+                crosshair.style.left = `${x}px`;
+                
+                // ツールチップが画面端で見切れないように調整
+                const tooltipWidth = tooltip.offsetWidth || 100;
+                let tooltipX = x;
+                if (tooltipX < tooltipWidth / 2) tooltipX = tooltipWidth / 2;
+                if (tooltipX > rect.width - tooltipWidth / 2) tooltipX = rect.width - tooltipWidth / 2;
+                tooltip.style.left = `${tooltipX}px`;
+
+                // ツールチップのY座標を、その日のチャート線の高さに合わせる
+                const y = height - padding - ((dataPoint.price - minPrice) / (maxPrice - minPrice)) * (height - padding * 2);
+                const displayY = (y / height) * rect.height;
+                tooltip.style.top = `${displayY}px`;
+            };
+
+            const handleLeave = () => {
+                tooltip.style.display = 'none';
+                crosshair.style.display = 'none';
+            };
+
+            // PC用イベント
+            wrapper.addEventListener('mousemove', handleMove);
+            wrapper.addEventListener('mouseleave', handleLeave);
+            
+            // スマホ用イベント (指でなぞる操作)
+            wrapper.addEventListener('touchmove', (e) => handleMove(e), { passive: true });
+            wrapper.addEventListener('touchend', handleLeave);
 
         } catch (error) {
             console.error("Failed to draw chart:", error);
-            document.getElementById('btc-chart').innerHTML = '<div class="loading" style="text-align:center; line-height:180px;">Unavailable</div>';
+            document.getElementById('btc-chart').innerHTML = '<div class="loading" style="text-align:center; line-height:200px;">Unavailable</div>';
         }
     }
     
