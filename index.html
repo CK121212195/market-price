@@ -13,17 +13,20 @@
       gtag('config', 'G-X1J77SKSG3');
     </script>
 
-    <!-- Meta Tags -->
-    <title>THE BITCOIN OVERVIEW</title>
+    <!-- Meta Tags (OGP画像のバグを修正しました) -->
+    <title>THE BITCOIN OVERVIEW | VOGUE Style</title>
     <link rel="icon" href="favicon.png" type="image/png">
+    
     <meta property="og:title" content="THE BITCOIN OVERVIEW">
     <meta property="og:description" content="Real-time Bitcoin Dashboard, On-chain Stats & Converter">
-    <meta property="og:image" content="og-image.png">
+    <meta property="og:url" content="https://ck121212195.github.io/market-price/">
+    <meta property="og:type" content="website">
+    <meta property="og:image" content="https://ck121212195.github.io/market-price/og-image.png">
 
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:title" content="THE BITCOIN OVERVIEW">
     <meta name="twitter:description" content="Real-time Bitcoin Dashboard, On-chain Stats & Converter">
-    <meta name="twitter:image" content="https://github.com/CK121212195/market-price/og-image.png">
+    <meta name="twitter:image" content="https://ck121212195.github.io/market-price/og-image.png">
 
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -184,6 +187,59 @@
         }
         
         .loading { color: var(--border-color) !important; font-size: 1.5rem; font-style: italic; }
+
+        /* --- Custom Chart Section (VOGUE Style) --- */
+        .chart-section {
+            margin-bottom: 5rem;
+        }
+
+        .chart-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            margin-bottom: 1.5rem;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 0.5rem;
+        }
+
+        .chart-title {
+            font-family: var(--font-heading);
+            font-size: 1.5rem;
+            font-style: italic;
+            color: var(--text-main);
+        }
+
+        .chart-duration {
+            font-size: 0.65rem;
+            letter-spacing: 0.2em;
+            font-weight: 600;
+            color: var(--text-sub);
+            text-transform: uppercase;
+        }
+
+        .chart-container {
+            width: 100%;
+            height: 180px; /* チャートの高さ */
+            position: relative;
+        }
+
+        .chart-svg {
+            width: 100%;
+            height: 100%;
+            overflow: visible;
+        }
+
+        .chart-line {
+            fill: none;
+            stroke: var(--text-main); /* 漆黒の極細ライン */
+            stroke-width: 1.5;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+        }
+
+        .chart-area {
+            fill: url(#chart-gradient);
+        }
 
         /* --- Section Titles --- */
         .section-header {
@@ -424,6 +480,17 @@
         </div>
     </div>
 
+    <!-- 1-YEAR TREND CHART (完全自作SVGの爆速お洒落チャート) -->
+    <div class="chart-section">
+        <div class="chart-header">
+            <span class="chart-title">Price Trend</span>
+            <span class="chart-duration">Past 1 Year</span>
+        </div>
+        <div class="chart-container" id="btc-chart">
+            <div class="loading" style="text-align: center; line-height: 180px;">Drawing...</div>
+        </div>
+    </div>
+
     <!-- NETWORK STATISTICS -->
     <div class="stats-section">
         <h2 class="section-header">Network Statistics</h2>
@@ -526,6 +593,61 @@ document.addEventListener("DOMContentLoaded", () => {
     const satsJpyEl = document.getElementById('sats-jpy');
 
     // ==========================================
+    // 0. 超軽量 1-Year Trend Chart (SVG描画)
+    // ==========================================
+    async function drawChart() {
+        try {
+            // Binanceの無料APIから過去365日分の終値を取得
+            const res = await fetch('https://api.binance.com/api/v3/klines?symbol=BTCUSDT&interval=1d&limit=365');
+            const data = await res.json();
+            
+            // 終値（インデックス4）の配列を作成
+            const prices = data.map(candle => parseFloat(candle[4]));
+            const minPrice = Math.min(...prices);
+            const maxPrice = Math.max(...prices);
+            
+            // SVGキャンバスの設定
+            const width = 1000;
+            const height = 180;
+            const padding = 10;
+            
+            // 座標（ポイント）の計算
+            const points = prices.map((price, index) => {
+                const x = (index / (prices.length - 1)) * width;
+                const y = height - padding - ((price - minPrice) / (maxPrice - minPrice)) * (height - padding * 2);
+                return `${x},${y}`;
+            }).join(' ');
+
+            // 塗りつぶしエリア用の座標
+            const areaPoints = `0,${height} ${points} ${width},${height}`;
+
+            // HTMLにSVG（ベクター画像）を直接挿入
+            const svgHtml = `
+                <svg class="chart-svg" viewBox="0 0 ${width} ${height}" preserveAspectRatio="none">
+                    <defs>
+                        <linearGradient id="chart-gradient" x1="0" y1="0" x2="0" y2="1">
+                            <stop offset="0%" stop-color="rgba(0, 0, 0, 0.08)" />
+                            <stop offset="100%" stop-color="rgba(0, 0, 0, 0)" />
+                        </linearGradient>
+                    </defs>
+                    <polygon class="chart-area" points="${areaPoints}" />
+                    <polyline class="chart-line" points="${points}" />
+                </svg>
+            `;
+            
+            document.getElementById('btc-chart').innerHTML = svgHtml;
+
+        } catch (error) {
+            console.error("Failed to draw chart:", error);
+            document.getElementById('btc-chart').innerHTML = '<div class="loading" style="text-align:center; line-height:180px;">Unavailable</div>';
+        }
+    }
+    
+    // チャート描画の実行
+    drawChart();
+
+
+    // ==========================================
     // 1. ネットワーク統計データの取得と計算
     // ==========================================
     function calculateSupply(blockHeight) {
@@ -563,8 +685,7 @@ document.addEventListener("DOMContentLoaded", () => {
             
             updateMarketCap();
 
-            // 安全な配列の処理（エラー防止のため一度変数に代入）
-            const statIds =['stat-block', 'stat-fee', 'stat-supply', 'stat-mcap'];
+            const statIds = ['stat-block', 'stat-fee', 'stat-supply', 'stat-mcap'];
             statIds.forEach(id => {
                 const el = document.getElementById(id);
                 if (el) el.classList.remove('loading');
@@ -575,8 +696,7 @@ document.addEventListener("DOMContentLoaded", () => {
             document.getElementById('stat-block').innerText = "Unavailable";
             document.getElementById('stat-fee').innerText = "Unavailable";
             
-            // エラーが発生した場合も取得中の文字（loading）を解除
-            const statIds =['stat-block', 'stat-fee', 'stat-supply', 'stat-mcap'];
+            const statIds = ['stat-block', 'stat-fee', 'stat-supply', 'stat-mcap'];
             statIds.forEach(id => {
                 const el = document.getElementById(id);
                 if (el) el.classList.remove('loading');
@@ -682,8 +802,7 @@ document.addEventListener("DOMContentLoaded", () => {
         if (type !== 'usd') document.getElementById('input-usd').value = (btc * rateUsd).toFixed(2);
     }
 
-    // 安全な配列の処理（エラー防止のため一度変数に代入）
-    const inputTypes =['sats', 'btc', 'jpy', 'usd'];
+    const inputTypes = ['sats', 'btc', 'jpy', 'usd'];
     inputTypes.forEach(type => {
         const el = document.getElementById(`input-${type}`);
         if (el) {
